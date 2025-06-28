@@ -7,7 +7,7 @@ In your Developer Machine do the next:
 
 2. Change to the airgap directory
 ```
-cd edge/airgap
+cd installer
 ```
 3. Prepare a fresh environment
 ```
@@ -30,9 +30,11 @@ Note: You should start docker before run it
 
 ## Setting up K3s with the installer (RPI with Rasbian Bookworm)
 In your edge device run the following steps:
-1. Set your WLAN location before start (sudo raspi-config Localization Options > WLAN Country)
+1. Set your WLAN location before start (sudo raspi-config Localisation Options > WLAN Country)
 2. Set a temporary WIFI Connection with nmtui
+sudo mount /dev/sda1 /mnt
 2. Copy the file to the edge device (Mount a USB Device)
+cp /mnt/k3s_airgapped_installer.tgz .
 3. Untar the file in /opt/k3s:
 ```
 sudo mkdir -p /opt/k3s
@@ -56,7 +58,7 @@ cd /opt/k3s
 ```
 sudo /bin/bash installer.sh k3s-install
 ```
-
+## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
 sudo ctr containers list 
 #skopeo

@@ -1,21 +1,76 @@
 K3S_VERSION=v1.32.3%2Bk3s1
 ZOT_VERSION=v2.1.2
 K3S_ARCH=arm64
+HOTSPOT_NAME="MAYABOX"
+HOTSPOT_ADDRESS="192.168.0.100/24"
+HOTSPOT_GATEWAY="192.168.0.1"
+NETWORK_INTERFACE="wlan0"
+
+function write_st(){
+  echo '{{ Color "99" "0" " <<< '$1' >>>\n " }}'| gum format -t template
+}
+
+function write_ft(){
+  gum format -- "$@"
+}
+
+function write_line(){
+  echo '{{ Color "10" "0" " '$1'\n " }}'| gum format -t template
+}
+
+function write_emo(){
+  echo $1 | gum format -t emoji
+}
+
+function write_box(){
+  gum style \
+        --foreground 212 --border-foreground 212 --border double \
+        --align center --width 50 --margin "1 2" --padding "2 4" \
+        "$@"
+}
+
+function read_var(){
+  export $1=$(gum input --value=$2)
+}
+
+function spinner(){
+  gum spin --spinner dot --show-error --title "$1" $2
+}
+
+function dialog_yn(){
+  gum confirm && export $1="yes" || export $1="no"
+}
+
+function gum-install(){
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+  sudo apt update && sudo apt install gum  
+}
 
 function set-wifi(){
-nmcli con add con-name MAYABOX ifname wlan0 type wifi ssid MAYABOX mode ap
-nmcli con modify MAYABOX connection.autoconnect yes
-nmcli con modify MAYABOX ipv4.method shared ipv4.address 192.168.0.100/24 ipv4.gateway 192.168.0.1
-nmcli con modify MAYABOX ipv6.method disabled
-nmcli con up MAYABOX
+nmcli con add con-name $HOTSPOT_NAME ifname $NETWORK_INTERFACE type wifi ssid $HOTSPOT_NAME mode ap
+nmcli con modify $HOTSPOT_NAME connection.autoconnect yes
+nmcli con modify $HOTSPOT_NAME ipv4.method shared ipv4.address $HOTSPOT_ADDRESS ipv4.gateway $HOTSPOT_GATEWAY
+nmcli con modify $HOTSPOT_NAME ipv6.method disabled
+nmcli con up $HOTSPOT_NAME
+}
+
+function install-k8s-packages(){
+  sudo export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get install -y dialog nano gpg curl iptables-persistent skopeo
 }
 
 function install-dep(){
+  echo "Installing Gum first"
   sudo apt-get update
-  sudo apt-get install -y dialog iptables-persistent skopeo
+  gum-install
+  sleep 5
+  spinner "Installing missing dependencies..." "sudo /bin/bash /opt/k3s/installer.sh install-k8s-packages"
 }
 
 function clean(){
+  echo "starting cleanup"
   rm k3s_airgapped_installer.tgz
   rm -R images
   rm k3s-airgap-images-$K3S_ARCH.tar
@@ -79,7 +134,7 @@ function clean-k3s-installation(){
   exit 0
 }
 
-function pre-install(){
+function zot-install(){
   echo "Pre Configuring Zot Registry"
   sudo mv /opt/k3s/zot-linux-$K3S_ARCH /usr/bin/zot
   sudo chmod +x /usr/bin/zot
@@ -186,36 +241,58 @@ echo "function save-image(){
   echo $(ls images/)
 }
 
-
-
 function k3s-install(){
-  pre-install
-  echo ">>>> Installing K3s"
+  write_box 'Welcome to Kubemaya' 'Running airgapped envs on edge'
+  write_st "Fill the next information to prepare your device"
+  write_line "Input the Hotspot Network Name to create:"
+  read_var HOTSPOT_NAME $HOTSPOT_NAME
+  write_line $HOTSPOT_NAME
+  write_line "Input the Hotspot address:"
+  read_var HOTSPOT_ADDRESS $HOTSPOT_ADDRESS
+  write_line $HOTSPOT_ADDRESS
+  write_line "Input the Hotspot gateway:"
+  read_var HOTSPOT_GATEWAY $HOTSPOT_GATEWAY
+  write_line $HOTSPOT_GATEWAY
+  write_line "Input the Hotspot INTERFACE:"
+  read_var NETWORK_INTERFACE $NETWORK_INTERFACE
+  write_line $NETWORK_INTERFACE
+  write_line "Install local Zot container registry (y/n)"
+  read_var ZOT_INSTALL y
+  write_line "Extra parameters for K3s"
+  read_var K3S_EXTRA_PARS " "
+
+  if [[ "$ZOT_INSTALL" == *"y"* ]]; then
+    write_st "Zot will be installed"
+  else
+    echo "Zot installation skipped"
+  fi
+
+  write_st "Installing K3s"
   #set-network
-  set-wifi
-  sleep 10
+  spinner "Setting Wifi" "/bin/bash installer.sh set-wifi"
+  write_st "Wifi Configured"
+  spinner "Waiting for wifi connection" "sleep 10"
+  write_st "Wifi Ready"
+  write_st "Preparing installation"
   cd /opt/k3s
-  echo "In folder "$(pwd)
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 
   sudo mkdir -p /usr/local/bin/
   sudo mv k3s-$K3S_ARCH /usr/local/bin/k3s
   sudo mv k3s-airgap-images-$K3S_ARCH.tar /var/lib/rancher/k3s/agent/images/
   sudo mv images/*.tar /var/lib/rancher/k3s/agent/images/
 
-
   sudo chmod +x /usr/local/bin/k3s
   sudo chmod +x /opt/k3s/install.sh
-
+  write_st "Ready to install"
 ## For agents
 ##  INSTALL_K3S_SKIP_DOWNLOAD=true K3S_URL=https://$MASTER_NODE_IP_OR_FQDN:6443 K3S_TOKEN=$TOKEN_TO_USE ./install.sh
-  sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644"  ./install.sh
-
+  write_st "Installing K3s"
+  sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" $K3S_EXTRA_PARS ./install.sh
+  write_emo "K3s installation done - check output for error :smile:"
 
 #echo "Load Container Images"
 #skopeo copy --format=oci docker-archive:nginx.tar docker://127.0.0.1:8080/nginx2 --dest-tls-verify=false
-
 }
 
 ##call the proper function
-#$1 $2 $3
 "$@"
