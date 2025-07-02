@@ -80,4 +80,4 @@ is connected to the new MAYABOX Network
 /bin/bash scripts/kubemaya.sh package sergioarmgpl demo-application v1 amd64
 Pending to add deployment variables
 
-## Create an application manually
+## Create & package an application manually
