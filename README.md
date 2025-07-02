@@ -24,13 +24,16 @@ busybox 1.37.0 linux/arm64/v8
 redis 8.0.0-alpine3.21 linux/arm64/v8
 nginx 1.17.5-alpine linux/arm64/v8
 ```   
-**Note:** The format used in this file is ```image version architecture```   
+**Note:** The format used in this file is ```image version architecture```  
+
 4. Start you docker service and be sure of having the docker cli   
+
 5. Generate the tgz file which contains all the images to run offline and the installer   
 ```
 /bin/bash kubemaya.sh gen-installer
 ```
-Note: You should start docker before run it   
+Note: You should start docker before run it.   
+
 6. Copy the k3s_airgapped_installer.tgz to a USB storage
 
 ## Setting up K3s with the installer (RPI with Rasbian Bookworm)
