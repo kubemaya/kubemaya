@@ -131,9 +131,10 @@ function install-k8s-packages(){
 function install-dep(){
   echo "Installing Gum first"
   sudo apt-get update
+  sudo apt-get install -y gpg git
   gum-install
   sleep 5
-  spinner "Installing missing dependencies..." "sudo /bin/bash /opt/k3s/installer.sh install-k8s-packages"
+  spinner "Installing missing dependencies..." "sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-k8s-packages"
 }
 
 function clean(){
@@ -181,8 +182,9 @@ function gen-installer(){
 
 function scp_device(){
   IP_ADDRESS=$1
+  USER=$2
   echo "Copy files to device ${IP_ADDRESS}"
-  scp installer.sh deb/*  k3s_airgapped_installer.tgz developer@${IP_ADDRESS}:/home/developer
+  scp k3s_airgapped_installer.tgz $USER@${IP_ADDRESS}:/home/$USER
   exit 0
 }
 

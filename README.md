@@ -14,6 +14,8 @@ cd kubemaya
 ```
 3. Prepare a fresh environment
 ```
+export PATH=$PATH:$(pwd)/scripts
+chmod +x scripts/kubemaya.sh
 /bin/bash kubemaya.sh clean
 ```
 4. Set the container files that you to include in your installer by setting the content in the images for example:
@@ -45,11 +47,11 @@ sudo tar -xzvf k3s_airgapped_installer.tgz -C /opt/k3s
 ```
 4. Install missing dependencies (Tested in Rasbian minimal)
 ```
-sudo /bin/bash /opt/k3s/kubemaya.sh install-dep
+sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 ```
 5. Set the flags to use containers in your device by running:
 ```
-/bin/bash /opt/k3s/kubemaya.sh set-flags
+/bin/bash /opt/k3s/scripts/kubemaya.sh set-flags
 ```
 Note: This restarts your device
 6. Disable your current wifi-connection if set (nmtui in Raspbian)
