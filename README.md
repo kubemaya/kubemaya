@@ -68,11 +68,11 @@ sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 8. Disable your current wifi-connection if set (nmtui in Raspbian)  
 9. Change to the installer path
 ```
-cd /opt/k3s/scripts
+cd /opt/k3s
 ```
 10. Install K3s running:
 ```
-sudo /bin/bash kubemaya.sh k3s-install
+sudo /bin/bash scripts/kubemaya.sh k3s-install
 ```
 ## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
