@@ -57,7 +57,7 @@ Note: This restarts your device
 6. Disable your current wifi-connection if set (nmtui in Raspbian)
 7. Change to the installer path
 ```
-cd /opt/k3s
+sudo cd /opt/k3s/scripts
 ```
 8. Install K3s running:
 ```
