@@ -3,11 +3,12 @@ from k8s import getAllDeployments
 from upload_app import uploadApp
 from menu_app import showApps
 from device import shutdown,restart,memory,CPU,disk
+from command import cli
 import os
 
 def del_app():
     os.system("/bin/bash delete.sh delete "+i.value)
-    dialog.open
+    ui.notify("Deleted Deployment "+i.value,position="top",type="positive")
 
 @ui.page('/login')
 def page1():
@@ -23,6 +24,7 @@ with ui.tabs() as tabs:
     ui.tab('upload', label='Upload', icon='add_to_home_screen')
     ui.tab('delete', label='Delete', icon='delete')
     ui.tab('device', label='Device', icon='router')
+    ui.tab('cmd', label='Commands', icon='code')
     #ui.html("<strong>KUBEMAYA</strong>")
 
 with ui.tab_panels(tabs, value='h').classes('w-full'):
@@ -56,7 +58,10 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
         with ui.button_group():
             ui.button("Restart", on_click=lambda: restart(),color="amber")
             ui.button("Shutdown", on_click=lambda: shutdown(), color="purple")
-        
+    with ui.tab_panel('cmd'):
+        #ui.label('Available Apps')
+        #ui.markdown('### Available Apps')
+        cli()        
 #ui.link('Visit other page', page1)
 #ui.link('Visit dark page', page2)
 

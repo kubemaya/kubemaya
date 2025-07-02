@@ -72,3 +72,12 @@ kubectl create ingress nginx --rule=/=nginx:80
 Access the nginx in http://192.168.0.100 in the device that
 is connected to the new MAYABOX Network
 
+
+
+## Create application to deploy
+1. Clone the demo-application folder
+/bin/bash scripts/kubemaya.sh create-app demo-application
+/bin/bash scripts/kubemaya.sh package sergioarmgpl demo-application v1 amd64
+Pending to add deployment variables
+
+## Create an application manually

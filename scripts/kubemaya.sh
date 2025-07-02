@@ -6,6 +6,73 @@ HOTSPOT_ADDRESS="192.168.0.100/24"
 HOTSPOT_GATEWAY="192.168.0.1"
 NETWORK_INTERFACE="wlan0"
 
+#function createDockerfile(){
+#  rm apps/$1/src/Dockerfile
+#echo '
+#FROM python:3-alpine
+#WORKDIR /app
+#COPY requirements.txt .
+#RUN pip install -r requirements.txt
+#COPY . .
+#EXPOSE 8080
+#CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
+#}
+
+function create-app(){
+APP=$1
+DEST=apps/$APP/src
+mkdir -p apps/$APP/src
+echo "FROM python:3-alpine
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["ash", "-c", "python index.py"] " > $DEST/Dockerfile
+
+echo "from flask import Flask, request
+from flask import jsonify
+
+app = Flask(__name__)
+
+@app.route("/_health", methods=["GET"])
+def getTotal(bid):
+    data = {"response":"OK"}
+    return jsonify(data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=True)" > $DEST/index.py
+
+echo "flask
+requests" > $DEST/requirements.txt
+
+echo "Created $APP in apps/$APP directory"
+}  
+
+function package(){
+    DOCKER_USER=$1
+    IMAGE_NAME=$2
+    IMAGE_TAG=$3
+    PLATFORM=$4
+    DEST=package/$IMAGE_NAME
+    mkdir -p $DEST
+    createDockerfile $IMAGE_NAME
+    cd apps/$IMAGE_NAME/src
+    docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
+    echo $(pwd)
+    docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
+    kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
+    cd ../../../
+    echo $(pwd)
+    read
+    cd package/$IMAGE_NAME
+    tar -czvf $IMAGE_NAME.tgz *
+    mv $IMAGE_NAME.tgz ../
+    cd ../../
+    echo $(pwd)
+    echo "Package package/$IMAGE_NAME.tgz created"
+}
+
 function write_st(){
   echo '{{ Color "99" "0" " <<< '$1' >>>\n " }}'| gum format -t template
 }

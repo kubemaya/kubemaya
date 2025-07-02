@@ -62,27 +62,15 @@ def getAllDeployments():
             </q-td>
             <q-td key="namespace" :props="props">
                 {{ props.row.namespace }}
-                <q-popup-edit v-model="props.row.namespace" v-slot="scope"
-                    @update:model-value="() => $parent.$emit('rename', props.row)"
-                >
-                    <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-                </q-popup-edit>
+
             </q-td>
             <q-td key="name" :props="props">
                 {{ props.row.name }}
-                <q-popup-edit v-model="props.row.name" v-slot="scope"
-                    @update:model-value="() => $parent.$emit('rename', props.row)"
-                >
-                    <q-input v-model.number="scope.value" type="number" dense autofocus counter @keyup.enter="scope.set" />
-                </q-popup-edit>
+
             </q-td>
             <q-td key="status" :props="props">
                 {{ props.row.status }}
-                <q-popup-edit v-model="props.row.status" v-slot="scope"
-                    @update:model-value="() => $parent.$emit('rename', props.row)"
-                >
-                    <q-input v-model.number="scope.value" type="number" dense autofocus counter @keyup.enter="scope.set" />
-                </q-popup-edit>
+
             </q-td>
         </q-tr>
     ''')

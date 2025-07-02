@@ -32,10 +32,10 @@ def CPU():
 def disk():
     disk_info = shutil.disk_usage('/')
     pdisk = disk_info.used/disk_info.total * 100
-    print(pdisk)
-    print(f"Total: {disk_info.total / (1024**3):.2f} GB")
-    print(f"Used: {disk_info.used / (1024**3):.2f} GB")
-    print(f"Free: {disk_info.free / (1024**3):.2f} GB")
+    #print(pdisk)
+    #print(f"Total: {disk_info.total / (1024**3):.2f} GB")
+    #print(f"Used: {disk_info.used / (1024**3):.2f} GB")
+    #print(f"Free: {disk_info.free / (1024**3):.2f} GB")
     with ui.row().classes('items-center'):
         ui.circular_progress(value=int(pdisk),min=0,max=100)
         ui.label('Disk Used')        
