@@ -38,28 +38,30 @@ In your edge device run the following steps:
 1. Set your WLAN location before start (sudo raspi-config Localisation Options > WLAN Country)
 2. Set a temporary WIFI Connection with nmtui
 sudo mount /dev/sda1 /mnt
-2. Copy the file to the edge device (Mount a USB Device)
+3. Copy the file to the edge device (Mount a USB Device)
 cp /mnt/k3s_airgapped_installer.tgz .
-3. Untar the file in /opt/k3s:
+4. Or copy the .tgz using scp using ssh
+/bin/bash kubemaya.sh scp_device 192.168.0.16 developer
+5. Untar the file in /opt/k3s:
 ```
 sudo mkdir -p /opt/k3s
 sudo tar -xzvf k3s_airgapped_installer.tgz -C /opt/k3s
 ```
-4. Install missing dependencies (Tested in Rasbian minimal)
+6. Install missing dependencies (Tested in Rasbian minimal)
 ```
 sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 ```
-5. Set the flags to use containers in your device by running(Raspberry only):
+7. Set the flags to use containers in your device by running(Raspberry only):
 ```
 /bin/bash /opt/k3s/scripts/kubemaya.sh set-flags
 ```
 Note: This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub and restart your device.  
-6. Disable your current wifi-connection if set (nmtui in Raspbian)  
-7. Change to the installer path
+8. Disable your current wifi-connection if set (nmtui in Raspbian)  
+9. Change to the installer path
 ```
 sudo cd /opt/k3s/scripts
 ```
-8. Install K3s running:
+10. Install K3s running:
 ```
 sudo /bin/bash kubemaya.sh k3s-install
 ```
