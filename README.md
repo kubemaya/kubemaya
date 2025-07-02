@@ -53,8 +53,8 @@ sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 ```
 /bin/bash /opt/k3s/scripts/kubemaya.sh set-flags
 ```
-Note: This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub.
-6. Disable your current wifi-connection if set (nmtui in Raspbian)
+Note: This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub and restart your device.  
+6. Disable your current wifi-connection if set (nmtui in Raspbian)  
 7. Change to the installer path
 ```
 sudo cd /opt/k3s/scripts
