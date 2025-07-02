@@ -49,11 +49,11 @@ sudo tar -xzvf k3s_airgapped_installer.tgz -C /opt/k3s
 ```
 sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 ```
-5. Set the flags to use containers in your device by running:
+5. Set the flags to use containers in your device by running(Raspberry only):
 ```
 /bin/bash /opt/k3s/scripts/kubemaya.sh set-flags
 ```
-Note: This restarts your device
+Note: This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub.
 6. Disable your current wifi-connection if set (nmtui in Raspbian)
 7. Change to the installer path
 ```
