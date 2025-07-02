@@ -4,14 +4,17 @@ Airgapped script for K3s running on Edge
 ## Creating the k3s installer (Developer Environment)
 In your Developer Machine do the next:
 1. Clone the repository
+```
+git clone https://github.com/sergioarmgpl/kubemaya.git
+```
 
 2. Change to the airgap directory
 ```
-cd installer
+cd kubemaya
 ```
 3. Prepare a fresh environment
 ```
-/bin/bash installer.sh clean
+/bin/bash kubemaya.sh clean
 ```
 4. Set the container files that you to include in your installer by setting the content in the images for example:
 ```
@@ -23,7 +26,7 @@ nginx 1.17.5-alpine linux/arm64/v8
 4. Start you docker service and be sure of having the docker cli
 5. Generate the tgz file which contains all the images to run offline and the installer
 ```
-/bin/bash installer.sh gen-installer
+/bin/bash kubemaya.sh gen-installer
 ```
 Note: You should start docker before run it
 6. Copy the k3s_airgapped_installer.tgz to a USB storage
@@ -42,11 +45,11 @@ sudo tar -xzvf k3s_airgapped_installer.tgz -C /opt/k3s
 ```
 4. Install missing dependencies (Tested in Rasbian minimal)
 ```
-sudo /bin/bash /opt/k3s/installer.sh install-dep
+sudo /bin/bash /opt/k3s/kubemaya.sh install-dep
 ```
 5. Set the flags to use containers in your device by running:
 ```
-/bin/bash /opt/k3s/installer.sh set-flags
+/bin/bash /opt/k3s/kubemaya.sh set-flags
 ```
 Note: This restarts your device
 6. Disable your current wifi-connection if set (nmtui in Raspbian)
@@ -56,7 +59,7 @@ cd /opt/k3s
 ```
 8. Install K3s running:
 ```
-sudo /bin/bash installer.sh k3s-install
+sudo /bin/bash kubemaya.sh k3s-install
 ```
 ## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
