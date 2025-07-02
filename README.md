@@ -37,11 +37,17 @@ Note: You should start docker before run it
 In your edge device run the following steps:
 1. Set your WLAN location before start (sudo raspi-config Localisation Options > WLAN Country)
 2. Set a temporary WIFI Connection with nmtui
+```
 sudo mount /dev/sda1 /mnt
+```
 3. Copy the file to the edge device (Mount a USB Device)
+```
 cp /mnt/k3s_airgapped_installer.tgz .
+```
 4. Or copy the .tgz using scp using ssh
+```
 /bin/bash kubemaya.sh scp_device 192.168.0.16 developer
+```
 5. Untar the file in /opt/k3s:
 ```
 sudo mkdir -p /opt/k3s
