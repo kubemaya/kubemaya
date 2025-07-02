@@ -46,7 +46,7 @@ cp /mnt/k3s_airgapped_installer.tgz .
 ```
 4. Or copy the .tgz using scp using ssh
 ```
-/bin/bash kubemaya.sh scp_device 192.168.0.16 developer
+/bin/bash kubemaya.sh scp_device <IP_ADDRESS> <USER>
 ```
 5. Untar the file in /opt/k3s:
 ```
@@ -65,7 +65,7 @@ Note: This restarts your device, also for Debian you have to set the following f
 8. Disable your current wifi-connection if set (nmtui in Raspbian)  
 9. Change to the installer path
 ```
-sudo cd /opt/k3s/scripts
+cd /opt/k3s/scripts
 ```
 10. Install K3s running:
 ```

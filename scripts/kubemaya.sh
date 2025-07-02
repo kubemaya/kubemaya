@@ -5,6 +5,7 @@ HOTSPOT_NAME="MAYABOX"
 HOTSPOT_ADDRESS="192.168.0.100/24"
 HOTSPOT_GATEWAY="192.168.0.1"
 NETWORK_INTERFACE="wlan0"
+HOTSPOT_INSTALL="y"
 
 #function createDockerfile(){
 #  rm apps/$1/src/Dockerfile
@@ -313,36 +314,48 @@ echo "function save-image(){
 function k3s-install(){
   write_box 'Welcome to Kubemaya' 'Running airgapped envs on edge'
   write_st "Fill the next information to prepare your device"
-  write_line "Input the Hotspot Network Name to create:"
-  read_var HOTSPOT_NAME $HOTSPOT_NAME
-  write_line $HOTSPOT_NAME
-  write_line "Input the Hotspot address:"
-  read_var HOTSPOT_ADDRESS $HOTSPOT_ADDRESS
-  write_line $HOTSPOT_ADDRESS
-  write_line "Input the Hotspot gateway:"
-  read_var HOTSPOT_GATEWAY $HOTSPOT_GATEWAY
-  write_line $HOTSPOT_GATEWAY
-  write_line "Input the Hotspot INTERFACE:"
-  read_var NETWORK_INTERFACE $NETWORK_INTERFACE
-  write_line $NETWORK_INTERFACE
-  write_line "Install local Zot container registry (y/n)"
+  
+  
+  write_line "Do you want to configure your device with a Wifi Hotspot(y/n):"
+  read_var HOTSPOT_INSTALL "y"
+  if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
+    write_line "Input the Hotspot Network Name to create:"
+    read_var HOTSPOT_NAME $HOTSPOT_NAME
+    write_line $HOTSPOT_NAME
+    write_line "Input the Hotspot address:"
+    read_var HOTSPOT_ADDRESS $HOTSPOT_ADDRESS
+    write_line $HOTSPOT_ADDRESS
+    write_line "Input the Hotspot gateway:"
+    read_var HOTSPOT_GATEWAY $HOTSPOT_GATEWAY
+    write_line $HOTSPOT_GATEWAY
+    write_line "Input the Hotspot INTERFACE:"
+    read_var NETWORK_INTERFACE $NETWORK_INTERFACE
+    write_line $NETWORK_INTERFACE
+  else
+    write_st "When Hotspot skipped, be sure to have a network configuration"
+  fi
+  write_line "Do you want to install a local Zot container registry (y/n)"
   read_var ZOT_INSTALL y
   write_line "Extra parameters for K3s"
   read_var K3S_EXTRA_PARS " "
 
+
+
+  #set-network
+  if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
+    spinner "Setting Wifi" "/bin/bash installer.sh set-wifi"
+    write_st "Wifi Configured"
+    spinner "Waiting for wifi connection" "sleep 10"
+    write_st "Wifi Ready"
+    write_st "Preparing installation"
+  fi
   if [[ "$ZOT_INSTALL" == *"y"* ]]; then
     write_st "Zot will be installed"
+    zot-install
   else
     echo "Zot installation skipped"
   fi
-
   write_st "Installing K3s"
-  #set-network
-  spinner "Setting Wifi" "/bin/bash installer.sh set-wifi"
-  write_st "Wifi Configured"
-  spinner "Waiting for wifi connection" "sleep 10"
-  write_st "Wifi Ready"
-  write_st "Preparing installation"
   cd /opt/k3s
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 
   sudo mkdir -p /usr/local/bin/
@@ -358,7 +371,7 @@ function k3s-install(){
   write_st "Installing K3s"
   sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" $K3S_EXTRA_PARS ./install.sh
   write_emo "K3s installation done - check output for error :smile:"
-
+  
 #echo "Load Container Images"
 #skopeo copy --format=oci docker-archive:nginx.tar docker://127.0.0.1:8080/nginx2 --dest-tls-verify=false
 }
