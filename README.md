@@ -26,15 +26,15 @@ nginx 1.17.5-alpine linux/arm64/v8
 ```   
 **Note:** The format used in this file is ```image version architecture```  
 
-4. Start you docker service and be sure of having the docker cli   
+5. Start you docker service and be sure of having the docker cli   
 
-5. Generate the tgz file which contains all the images to run offline and the installer   
+6. Generate the tgz file which contains all the images to run offline and the installer   
 ```
 /bin/bash kubemaya.sh gen-installer
 ```
 **Note:** You should start docker before run it.   
 
-6. Copy the k3s_airgapped_installer.tgz to a USB storage
+7. Copy the k3s_airgapped_installer.tgz to a USB storage
 
 ## Setting up K3s with the installer (RPI with Rasbian Bookworm)
 In your edge device run the following steps:
