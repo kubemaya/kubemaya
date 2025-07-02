@@ -32,7 +32,7 @@ nginx 1.17.5-alpine linux/arm64/v8
 ```
 /bin/bash kubemaya.sh gen-installer
 ```
-Note: You should start docker before run it.   
+**Note:** You should start docker before run it.   
 
 6. Copy the k3s_airgapped_installer.tgz to a USB storage
 
@@ -64,7 +64,7 @@ sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-dep
 ```
 /bin/bash /opt/k3s/scripts/kubemaya.sh set-flags
 ```
-Note: This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub and restart your device.  
+**Note:** This restarts your device, also for Debian you have to set the following flag systemd.unified_cgroup_hierarchy=1 in the variable GRUB_CMDLINE_LINUX_DEFAULT inside the file /etc/default/grub and restart your device.  
 8. Disable your current wifi-connection if set (nmtui in Raspbian)  
 9. Change to the installer path
 ```
