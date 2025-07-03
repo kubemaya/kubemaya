@@ -1,11 +1,14 @@
 K3S_VERSION=v1.32.3%2Bk3s1
 ZOT_VERSION=v2.1.2
-K3S_ARCH=arm64
 HOTSPOT_NAME="MAYABOX"
 HOTSPOT_ADDRESS="192.168.0.100/24"
 HOTSPOT_GATEWAY="192.168.0.1"
 NETWORK_INTERFACE="wlan0"
 HOTSPOT_INSTALL="y"
+
+if [ -z "$K3S_ARCH" ]; then
+    export K3S_ARCH=arm64
+fi
 
 #function createDockerfile(){
 #  rm apps/$1/src/Dockerfile
