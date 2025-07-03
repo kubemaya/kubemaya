@@ -32,8 +32,10 @@ nginx 1.17.5-alpine linux/arm64/v8
 ```
 /bin/bash kubemaya.sh gen-installer
 ```
-**Note:** You should start docker before run it.   
-
+**Note:** To override to a different architecture than arm64, use the variable K3S_ARCH=<amd64,etc>. Also, you have to start docker before run it.   
+```
+K3S_ARCH=SOME_VALUE /bin/bash kubemaya.sh gen-installer
+```
 7. Copy the k3s_airgapped_installer.tgz to a USB storage
 
 ## Setting up K3s with the installer (RPI with Rasbian Bookworm)
@@ -73,7 +75,9 @@ cd /opt/k3s
 10. Install K3s running:
 ```
 sudo /bin/bash scripts/kubemaya.sh k3s-install
-```
+```   
+**Note:** To override to a different architecture than arm64, use the variable K3S_ARCH=<amd64,etc>.
+
 ## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
 sudo ctr containers list 

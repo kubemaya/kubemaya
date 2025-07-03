@@ -153,6 +153,7 @@ function clean(){
 
 function gen-installer(){
   rm install.sh k3s-$K3S_ARCH k3s-airgap-images-$K3S_ARCH.tar
+  save-images
   echo "Downloading Zot Registry"
   curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
@@ -165,9 +166,8 @@ function gen-installer(){
   chmod +x k3s-$K3S_ARCH
   chmod +x install.sh
   echo "downloading images for zot"
-  save-images
   echo "Packing installer components"
-  tar -vzcf k3s_airgapped_installer.tgz $(ls)
+  tar --exclude='./apps' --exclude='./package' -vzcf k3s_airgapped_installer.tgz $(ls)
   sleep 5
   echo "Done"
   echo "Running cleanup"
@@ -304,7 +304,7 @@ echo "function save-image(){
   docker save \$IMG:\$VERSION > images/\$IMG.tar
 }" >> save-images.sh
 
-  cat containers | awk '{print "save-image "$1,$2,$3;}' >> save-images.sh
+  cat scripts/containers | awk '{print "save-image "$1,$2,$3;}' >> save-images.sh
   sleep 2s
   echo "Downloading container images"
   /bin/bash save-images.sh
@@ -314,8 +314,6 @@ echo "function save-image(){
 function k3s-install(){
   write_box 'Welcome to Kubemaya' 'Running airgapped envs on edge'
   write_st "Fill the next information to prepare your device"
-  
-  
   write_line "Do you want to configure your device with a Wifi Hotspot(y/n):"
   read_var HOTSPOT_INSTALL "y"
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
