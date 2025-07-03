@@ -10,21 +10,24 @@ if [ -z "$K3S_ARCH" ]; then
     export K3S_ARCH=arm64
 fi
 
-#function createDockerfile(){
-#  rm apps/$1/src/Dockerfile
-#echo '
-#FROM python:3-alpine
-#WORKDIR /app
-#COPY requirements.txt .
-#RUN pip install -r requirements.txt
-#COPY . .
-#EXPOSE 8080
-#CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
-#}
+function createDockerfile(){
+  rm apps/$1/src/Dockerfile
+echo '
+FROM python:3-alpine
+WORKDIR /app
+COPY requirements.txt .
+RUN apk update
+RUN apk add build-base gcc python3-dev musl-dev linux-headers
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
+}
 
 function build-mayaui(){
+  echo "Packaging kubemaya"
   package kubemaya mayaui v1 $K3S_ARCH
-  mv package/kubemaya.tgz .
+  mv package/mayaui.tgz .
 }
 
 function create-app(){
@@ -64,6 +67,7 @@ function package(){
     IMAGE_TAG=$3
     PLATFORM=$4
     DEST=package/$IMAGE_NAME
+    echo "building for $PLATFORM"
     mkdir -p $DEST
     createDockerfile $IMAGE_NAME
     cd apps/$IMAGE_NAME/src
@@ -73,7 +77,6 @@ function package(){
     kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
     cd ../../../
     echo $(pwd)
-    read
     cd package/$IMAGE_NAME
     tar -czvf $IMAGE_NAME.tgz *
     mv $IMAGE_NAME.tgz ../
@@ -148,7 +151,7 @@ function install-dep(){
 
 function clean(){
   echo "starting cleanup"
-  rm k3s_airgapped_installer.tgz
+  rm *.tgz
   rm -R images
   rm k3s-airgap-images-$K3S_ARCH.tar
   rm zot-linux-$K3S_ARCH
@@ -172,6 +175,7 @@ function gen-installer(){
   fi
   rm install.sh k3s-$K3S_ARCH k3s-airgap-images-$K3S_ARCH.tar
   save-images
+  build-mayaui
   echo "Downloading Zot Registry"
   curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
@@ -190,7 +194,6 @@ function gen-installer(){
   else
     chmod +x k3s
   fi
-  build-mayaui
   chmod +x install.sh
   echo "Packing installer components"
   tar --exclude='./apps' --exclude='./package' -vzcf k3s_airgapped_installer.tgz $(ls)

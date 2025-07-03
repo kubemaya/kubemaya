@@ -17,6 +17,10 @@ cd kubemaya
 export PATH=$PATH:$(pwd)/scripts
 chmod +x scripts/kubemaya.sh
 /bin/bash kubemaya.sh clean
+```
+Note: To override the architecture use the following command:
+```
+K3S_ARCH=amd64 /bin/bash kubemaya.sh clean
 ```   
 4. Set the container files that you to include in your installer by setting the content in the images for example:   
 ```
