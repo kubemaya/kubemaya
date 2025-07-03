@@ -22,6 +22,11 @@ fi
 #CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
 #}
 
+function build-mayaui(){
+  package kubemaya mayaui v1 $K3S_ARCH
+  mv package/kubemaya.tgz .
+}
+
 function create-app(){
 APP=$1
 DEST=apps/$APP/src
@@ -159,6 +164,12 @@ function clean(){
 }
 
 function gen-installer(){
+  if docker ps -a; then
+    echo "Docker running."
+  else
+    echo "Docker is not working. Please start the service."
+    exit 1
+  fi
   rm install.sh k3s-$K3S_ARCH k3s-airgap-images-$K3S_ARCH.tar
   save-images
   echo "Downloading Zot Registry"
@@ -179,8 +190,8 @@ function gen-installer(){
   else
     chmod +x k3s
   fi
+  build-mayaui
   chmod +x install.sh
-  echo "downloading images for zot"
   echo "Packing installer components"
   tar --exclude='./apps' --exclude='./package' -vzcf k3s_airgapped_installer.tgz $(ls)
   sleep 5
