@@ -148,7 +148,11 @@ function clean(){
   rm k3s-airgap-images-$K3S_ARCH.tar
   rm zot-linux-$K3S_ARCH
   rm install.sh
-  rm k3s-$K3S_ARCH
+  if [[ "$K3S_ARCH" == *"arm"* ]]; then
+    rm k3s-$K3S_ARCH
+  else
+    rm k3s
+  fi
   rm save-images.sh
   rm images/*
   echo "cleanup done"
@@ -160,13 +164,21 @@ function gen-installer(){
   echo "Downloading Zot Registry"
   curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
-  curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-$K3S_ARCH
+  if [[ "$K3S_ARCH" == *"arm"* ]]; then
+    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-$K3S_ARCH
+  else
+    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s
+  fi
   echo  "Download K3s install.sh script"
   curl -#L  https://get.k3s.io -o install.sh
   echo "Downloading airgap images"
   curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-airgap-images-$K3S_ARCH.tar
   echo "setting permissions to k3s and install.sh"
-  chmod +x k3s-$K3S_ARCH
+  if [[ "$K3S_ARCH" == *"arm"* ]]; then
+    chmod +x k3s-$K3S_ARCH
+  else
+    chmod +x k3s
+  fi
   chmod +x install.sh
   echo "downloading images for zot"
   echo "Packing installer components"
@@ -175,7 +187,11 @@ function gen-installer(){
   echo "Done"
   echo "Running cleanup"
   rm k3s-airgap-images-$K3S_ARCH.tar
-  rm k3s-$K3S_ARCH
+  if [[ "$K3S_ARCH" == *"arm"* ]]; then
+    rm k3s-$K3S_ARCH
+  else
+    rm k3s
+  fi
   rm save-images.sh
   rm zot-linux-$K3S_ARCH
   rm -R images
@@ -360,7 +376,11 @@ function k3s-install(){
   cd /opt/k3s
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 
   sudo mkdir -p /usr/local/bin/
-  sudo mv k3s-$K3S_ARCH /usr/local/bin/k3s
+  if [[ "$K3S_ARCH" == *"arm"* ]]; then
+    sudo mv k3s-$K3S_ARCH /usr/local/bin/k3s
+  else
+    sudo mv k3s /usr/local/bin
+  fi
   sudo mv k3s-airgap-images-$K3S_ARCH.tar /var/lib/rancher/k3s/agent/images/
   sudo mv images/*.tar /var/lib/rancher/k3s/agent/images/
 
