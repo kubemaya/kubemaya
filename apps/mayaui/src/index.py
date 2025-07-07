@@ -62,8 +62,6 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
         #ui.label('Available Apps')
         #ui.markdown('### Available Apps')
         cli()        
-#ui.link('Visit other page', page1)
-#ui.link('Visit dark page', page2)
 
 ui.timer(5.0, getAllDeployments.refresh)
 ui.timer(5.0, showApps.refresh)
