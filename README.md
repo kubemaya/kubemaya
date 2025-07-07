@@ -103,7 +103,8 @@ is connected to the new MAYABOX Network
 
 ## Create application to deploy
 1. Clone the demo-application folder
-/bin/bash scripts/kubemaya.sh create-app demo-application
+2. Rename the folder
+3. /bin/bash scripts/kubemaya.sh create-app demo-application
 /bin/bash scripts/kubemaya.sh package sergioarmgpl demo-application v1 amd64
 Pending to add deployment variables
 

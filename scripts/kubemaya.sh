@@ -28,6 +28,7 @@ function build-mayaui(){
   echo "Packaging kubemaya"
   package kubemaya mayaui v1 $K3S_ARCH
   mv package/mayaui.tgz .
+  export OVERWRITE_YAML=yes
 }
 
 function create-app(){
@@ -74,7 +75,12 @@ function package(){
     docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     echo $(pwd)
     docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
-    kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
+    if [[ ! -v OVERWRITE_YAML ]]; then 
+      kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
+    else
+      echo "Overwriting app.yaml with a custom file"
+      cp ../yaml/app.yaml ../../../$DEST/
+    fi
     cd ../../../
     echo $(pwd)
     cd package/$IMAGE_NAME
@@ -344,6 +350,13 @@ echo "function save-image(){
   echo $(ls images/)
 }
 
+function install-mayaui(){
+  sudo mkdir /opt/k3s/mayaui
+  sudo tar -xzvf /opt/k3s/mayaui.tgz -C /opt/k3s/mayaui
+  sudo mv /opt/k3s/mayaui/mayaui.tar /var/lib/rancher/k3s/agent/images
+  sudo mv /opt/k3s/mayaui/app.yaml /var/lib/rancher/k3s/server/manifests
+}
+
 function k3s-install(){
   write_box 'Welcome to Kubemaya' 'Running airgapped envs on edge'
   write_st "Fill the next information to prepare your device"
@@ -397,7 +410,7 @@ function k3s-install(){
   fi
   sudo mv k3s-airgap-images-$K3S_ARCH.tar /var/lib/rancher/k3s/agent/images/
   sudo mv images/*.tar /var/lib/rancher/k3s/agent/images/
-
+  install-mayaui
   sudo chmod +x /usr/local/bin/k3s
   sudo chmod +x /opt/k3s/install.sh
   write_st "Ready to install"
