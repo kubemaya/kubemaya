@@ -426,7 +426,7 @@ function k3s-install(){
   write_st "Installing K3s"
   sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" $K3S_EXTRA_PARS ./install.sh
   write_emo "K3s installation done - check output for error :smile:"
-  write_st "Installing Mayaui"
+  write_st "Installing MayaUI"
   install-mayaui
   
 #echo "Load Container Images"
