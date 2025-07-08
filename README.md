@@ -96,11 +96,11 @@ k3s-uninstall.sh
 rm -R /opt/k3s
 ```   
 
-## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
+Listing container images in the installation:
+```
 sudo ctr containers list 
-#skopeo
-
+```
 Run the following commands in the device to install nginx:
 ```
 kubectl create deploy nginx --image=nginx:1.17.5-alpine
@@ -109,7 +109,6 @@ kubectl create ingress nginx --rule=/=nginx:80
 ```
 Access the nginx in http://192.168.0.100 in the device that
 is connected to the new MAYABOX Network
-
 
 
 ## Create application to deploy
