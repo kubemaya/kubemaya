@@ -126,7 +126,7 @@ is connected to the new MAYABOX Network
 ```
 /bin/bash scripts/kubemaya.sh package sergioarmgpl demo-application v1 amd64
 ```   
-***To overriding the Dockefile and YAML***   
+***Overriding the Dockefile and YAML***   
 To override the Dockefile with your own set the variable:
 ```
 export OVERWRITE_DOCKERFILE=yes
