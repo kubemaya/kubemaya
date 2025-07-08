@@ -177,6 +177,7 @@ function clean(){
   fi
   rm save-images.sh
   rm images/*
+  rm -R package
   echo "cleanup done"
 }
 
