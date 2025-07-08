@@ -116,6 +116,7 @@ is connected to the new MAYABOX Network
 ***Option 1***
 1. Clone the demo-application folder
 2. Rename the folder   
+
 ***Option 2***
 1. Create an application by running:
 ```
