@@ -7,7 +7,7 @@ from command import cli
 import os
 
 def del_app():
-    os.system("/bin/bash delete.sh delete "+i.value)
+    os.system("/bin/sh delete.sh delete "+i.value)
     ui.notify("Deleted Deployment "+i.value,position="top",type="positive")
 
 @ui.page('/login')

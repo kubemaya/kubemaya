@@ -24,6 +24,7 @@ def extract(filename):
                 os.mkdir(DEST_APPS+filename)
                 tar.extractall(path=DEST_APPS+filename)
                 print(filename+" extracted")
+                print("/bin/sh deploy.sh deploy_app "+filename+" "+DEST_IMAGE+" "+DEST_APPS+" Uploaded in "+DEST_UPLOAD)
                 os.system("/bin/sh deploy.sh deploy_app "+filename+" "+DEST_IMAGE+" "+DEST_APPS)
                 return
         except:
