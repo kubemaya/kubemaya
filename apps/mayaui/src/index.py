@@ -69,4 +69,4 @@ ui.timer(5.0, memory.refresh)
 ui.timer(5.0, CPU.refresh)
 ui.timer(5.0, disk.refresh)
 
-ui.run()
+ui.run(host='0.0.0.0', port=8080, title='KubeMaya')

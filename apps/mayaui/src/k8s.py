@@ -25,8 +25,16 @@ def restart_deployment(v1_apps, deployment, namespace):
 @ui.refreshable
 def getAllDeployments():
     # Configs can be set in Configuration class directly or using helper utility
-    config.load_kube_config()
-
+    #config.load_kube_config()
+    #config.load_kube_config()
+    try:
+        config.load_incluster_config()
+    except config.ConfigException:
+        try:
+            config.load_kube_config()
+        except config.ConfigException:
+            raise Exception("Could not configure kubernetes client")
+    
     v1 = client.AppsV1Api()
     ret = v1.list_deployment_for_all_namespaces(watch=False)
     rows = []

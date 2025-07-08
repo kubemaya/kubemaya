@@ -6,6 +6,48 @@ metadata:
 spec: {}
 status: {}
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mayaui
+  namespace: kubemaya
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mayaui-cluster-role
+  namespace: kubemaya
+rules:
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["*"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["*"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["*"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: kubemaya
+  name: mayaui-cluster-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: mayaui
+    namespace: kubemaya
+roleRef:
+  kind: ClusterRole
+  name: mayaui-cluster-role
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,7 +55,7 @@ metadata:
   labels:
     app: mayaui
   name: mayaui
-  namespace: mayaui
+  namespace: kubemaya
 spec:
   replicas: 1
   selector:
@@ -26,16 +68,17 @@ spec:
       labels:
         app: mayaui
     spec:
+      serviceAccountName: mayaui
       volumes:
-      - name: /tmp/upload
+      - name: upload
         hostPath:
           path: /tmp/upload
           type: DirectoryOrCreate
-      - name: /tmp/apps
+      - name: apps
         hostPath:
           path: /tmp/apps
           type: DirectoryOrCreate
-      - name: /tmp/images
+      - name: images
         hostPath:
           path: /var/lib/rancher/k3s/agent/images
           type: DirectoryOrCreate
@@ -66,7 +109,7 @@ metadata:
   labels:
     app: mayaui
   name: mayaui
-  namespace: mayaui
+  namespace: kubemaya
 spec:
   ports:
   - port: 8080
@@ -82,7 +125,10 @@ kind: Ingress
 metadata:
   creationTimestamp: null
   name: nginx
-  namespace: mayaui
+  namespace: kubemaya
+  annotations:
+#    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
   - http:
@@ -93,6 +139,6 @@ spec:
             port:
               number: 8080
         path: /
-        pathType: Exact
+        pathType: Prefix
 status:
   loadBalancer: {}

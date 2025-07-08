@@ -75,8 +75,8 @@ function package(){
     docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     echo $(pwd)
     docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
-    if [[ ! -v OVERWRITE_YAML ]]; then 
-      kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
+    if [ ! -v $OVERWRITE_YAML ]; then 
+       kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
     else
       echo "Overwriting app.yaml with a custom file"
       cp ../yaml/app.yaml ../../../$DEST/
@@ -361,7 +361,7 @@ function k3s-install(){
   write_box 'Welcome to Kubemaya' 'Running airgapped envs on edge'
   write_st "Fill the next information to prepare your device"
   write_line "Do you want to configure your device with a Wifi Hotspot(y/n):"
-  read_var HOTSPOT_INSTALL "y"
+  read_var HOTSPOT_INSTALL "n"
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
     write_line "Input the Hotspot Network Name to create:"
     read_var HOTSPOT_NAME $HOTSPOT_NAME
@@ -379,7 +379,7 @@ function k3s-install(){
     write_st "When Hotspot skipped, be sure to have a network configuration"
   fi
   write_line "Do you want to install a local Zot container registry (y/n)"
-  read_var ZOT_INSTALL y
+  read_var ZOT_INSTALL "n"
   write_line "Extra parameters for K3s"
   read_var K3S_EXTRA_PARS " "
 
@@ -410,7 +410,6 @@ function k3s-install(){
   fi
   sudo mv k3s-airgap-images-$K3S_ARCH.tar /var/lib/rancher/k3s/agent/images/
   sudo mv images/*.tar /var/lib/rancher/k3s/agent/images/
-  install-mayaui
   sudo chmod +x /usr/local/bin/k3s
   sudo chmod +x /opt/k3s/install.sh
   write_st "Ready to install"
@@ -419,6 +418,8 @@ function k3s-install(){
   write_st "Installing K3s"
   sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" $K3S_EXTRA_PARS ./install.sh
   write_emo "K3s installation done - check output for error :smile:"
+  write_st "Installing Mayaui"
+  install-mayaui
   
 #echo "Load Container Images"
 #skopeo copy --format=oci docker-archive:nginx.tar docker://127.0.0.1:8080/nginx2 --dest-tls-verify=false

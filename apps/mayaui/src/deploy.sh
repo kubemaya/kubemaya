@@ -1,3 +1,5 @@
+#change into python https://blog.nashtechglobal.com/how-to-create-service-using-kubernetes-python-client/
+#https://github.com/kubernetes-client/python/tree/master/examples
 DEST_APPS=/tmp/apps
 APP_PORT=80
 #DEST_IMAGE=/tmp/imgs

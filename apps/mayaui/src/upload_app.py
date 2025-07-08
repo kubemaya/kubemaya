@@ -24,7 +24,7 @@ def extract(filename):
                 os.mkdir(DEST_APPS+filename)
                 tar.extractall(path=DEST_APPS+filename)
                 print(filename+" extracted")
-                os.system("/bin/bash deploy.sh deploy_app "+filename+" "+DEST_IMAGE+" "+DEST_APPS)
+                os.system("/bin/sh deploy.sh deploy_app "+filename+" "+DEST_IMAGE+" "+DEST_APPS)
                 return
         except:
             print("Waiting for file or trying again")
