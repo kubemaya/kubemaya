@@ -8,7 +8,7 @@ function deploy_app(){
     app=$1
     DEST_IMAGE=$2
     DEST_APPS=$3
-    cp *.tar $DEST_IMAGE
+    cp $DEST_APPS/$app/*.tar $DEST_IMAGE
     kubectl create ns $app
     kubectl apply -f $DEST_APPS/$app -n $app
     #kubectl rollout status deployment/$app -n $app --timeout=1m
