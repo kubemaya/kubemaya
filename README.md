@@ -85,6 +85,17 @@ sudo /bin/bash scripts/kubemaya.sh k3s-install
 sudo K3S_ARCH=SOME_VALUE /bin/bash scripts/kubemaya.sh k3s-install
 ```   
 
+## Cleaning previous installation
+To clean a previous installation run the following commands
+1. To uninstall K3s run:
+```
+k3s-uninstall.sh
+```   
+2. Delete the /opt/k3s directory:
+```
+rm -R /opt/k3s
+```   
+
 ## /var/lib/rancher/k3s/server/manifests
 ## Testing your installation
 sudo ctr containers list 
@@ -109,3 +120,4 @@ is connected to the new MAYABOX Network
 Pending to add deployment variables
 
 ## Create & package an application manually
+Documentation in Progress

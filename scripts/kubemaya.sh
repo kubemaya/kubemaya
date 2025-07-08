@@ -29,6 +29,7 @@ function build-mayaui(){
   package kubemaya mayaui v1 $K3S_ARCH
   mv package/mayaui.tgz .
   export OVERWRITE_YAML=yes
+  export OVERWRITE_DOCKERFILE=yes
 }
 
 function create-app(){
@@ -70,7 +71,11 @@ function package(){
     DEST=package/$IMAGE_NAME
     echo "building for $PLATFORM"
     mkdir -p $DEST
-    createDockerfile $IMAGE_NAME
+    if [ ! -v $OVERWRITE_DOCKERFILE ]; then 
+       createDockerfile $IMAGE_NAME
+    else
+      echo "Overwriting app.yaml with a custom file Dockerfile"
+    fi
     cd apps/$IMAGE_NAME/src
     docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     echo $(pwd)
