@@ -5,6 +5,8 @@ HOTSPOT_ADDRESS="192.168.0.100/24"
 HOTSPOT_GATEWAY="192.168.0.1"
 NETWORK_INTERFACE="wlan0"
 HOTSPOT_INSTALL="y"
+OVERWRITE_YAML=n
+OVERWRITE_DOCKERFILE=n
 
 if [ -z "$K3S_ARCH" ]; then
     export K3S_ARCH=arm64
@@ -26,10 +28,10 @@ CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
 
 function build-mayaui(){
   echo "Packaging kubemaya"
-  package kubemaya mayaui v1 $K3S_ARCH
-  mv package/mayaui.tgz .
   export OVERWRITE_YAML=yes
   export OVERWRITE_DOCKERFILE=yes
+  package kubemaya mayaui v1 $K3S_ARCH
+  mv package/mayaui.tgz .
 }
 
 function create-app(){
@@ -71,20 +73,21 @@ function package(){
     DEST=package/$IMAGE_NAME
     echo "building for $PLATFORM"
     mkdir -p $DEST
-    if [ ! -v $OVERWRITE_DOCKERFILE ]; then 
-       createDockerfile $IMAGE_NAME
+    if [[ "$OVERWRITE_DOCKERFILE" == *"y"* ]]; then
+      echo "Overwriting with a custom file Dockerfile"
     else
-      echo "Overwriting app.yaml with a custom file Dockerfile"
+      echo "Creating Dockerfile"
+      createDockerfile $IMAGE_NAME
     fi
     cd apps/$IMAGE_NAME/src
     docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     echo $(pwd)
     docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
-    if [ ! -v $OVERWRITE_YAML ]; then 
-       kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
-    else
+    if [[ "$OVERWRITE_YAML" == *"y"* ]]; then
       echo "Overwriting app.yaml with a custom file"
       cp ../yaml/app.yaml ../../../$DEST/
+    else
+      kubectl create deployment $IMAGE_NAME --image=$DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG --dry-run -o yaml > ../../../$DEST/app.yaml
     fi
     cd ../../../
     echo $(pwd)
