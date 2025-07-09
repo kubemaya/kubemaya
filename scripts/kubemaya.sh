@@ -49,6 +49,8 @@ mkdir -p apps/$APP/src
 echo "FROM python:3-alpine
 WORKDIR /app
 COPY requirements.txt .
+RUN apk update
+RUN apk add build-base gcc python3-dev musl-dev linux-headers
 RUN pip install -r requirements.txt
 COPY . .
 EXPOSE 8080
@@ -59,14 +61,14 @@ from flask import jsonify
 
 app = Flask(__name__)
 
-@app.route("/_health", methods=["GET"])
+@app.route(\"/_health\", methods=[\"GET\"])
 def getHealth():
-    data = {"response":"OK"}
+    data = {\"response\":\"OK\"}
     return jsonify(data)
 
-@app.route("/", methods=["GET"])
+@app.route(\"/\", methods=[\"GET\"])
 def index():
-    data = {"response":"It works"}
+    data = {\"response\":\"It works\"}
     return jsonify(data)
 
 if __name__ == '__main__':

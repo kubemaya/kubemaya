@@ -3,11 +3,15 @@ from nicegui import ui
 
 DEST_APPS="/tmp/apps"
 #HOST="http://192.168.0.100"
+
+def openApp(e):
+    ui.navigate.to('/'+e.sender.text,new_tab=True)
+    #ui.notify(e.sender.text)
+
 @ui.refreshable
 def showApps():
     apps = os.listdir(DEST_APPS)
     for app in apps:
-        ui.button(app, on_click=lambda: ui.navigate.to('/'+app,new_tab=True),color="standard")
-    #print(len(apps))
+        ui.button(app, on_click=openApp,color="standard")
     if len(apps) == 0:
         ui.label("0 Applications available")
