@@ -1,5 +1,5 @@
 function get_interfaces(){
-    interfaces=$(ls -U /app/sys/class/net | head -4)
+    interfaces=$(ls /app/sys/class/net | head -4)
     rm /app/interfaces
     touch /app/interfaces
     for interface in ${interfaces[@]}; do

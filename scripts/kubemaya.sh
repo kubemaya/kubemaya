@@ -13,7 +13,7 @@ if [ -z "$K3S_ARCH" ]; then
 fi
 
 function get_interface_ip_address(){
-  interfaces=$(ls -U /sys/class/net | head -4)
+  interfaces=$(ls /sys/class/net | head -4)
   interface=$(gum choose $interfaces)
   echo "Selected interface $interface"
 
@@ -380,6 +380,11 @@ function k3s-install(){
   write_line "Do you want to configure your device with a Wifi Hotspot(y/n):"
   read_var HOTSPOT_INSTALL "n"
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
+    write_line "Choose the Wifi Network Interface:"
+    interfaces=$(ls /sys/class/net | head -4)
+    interface=$(gum choose $interfaces)
+    export NETWORK_INTERFACE=$interface
+    write_line $NETWORK_INTERFACE
     write_line "Input the Hotspot Network Name to create:"
     read_var HOTSPOT_NAME $HOTSPOT_NAME
     write_line $HOTSPOT_NAME
@@ -389,9 +394,9 @@ function k3s-install(){
     write_line "Input the Hotspot gateway:"
     read_var HOTSPOT_GATEWAY $HOTSPOT_GATEWAY
     write_line $HOTSPOT_GATEWAY
-    write_line "Input the Hotspot INTERFACE:"
-    read_var NETWORK_INTERFACE $NETWORK_INTERFACE
-    write_line $NETWORK_INTERFACE
+#    write_line "Input the Hotspot INTERFACE:"
+#    read_var NETWORK_INTERFACE $NETWORK_INTERFACE
+#    write_line $NETWORK_INTERFACE
   else
     write_st "When Hotspot skipped, be sure to have a network configuration"
   fi
@@ -399,8 +404,6 @@ function k3s-install(){
   read_var ZOT_INSTALL "n"
   write_line "Extra parameters for K3s"
   read_var K3S_EXTRA_PARS " "
-
-
 
   #set-network
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
@@ -442,5 +445,4 @@ function k3s-install(){
 #skopeo copy --format=oci docker-archive:nginx.tar docker://127.0.0.1:8080/nginx2 --dest-tls-verify=false
 }
 
-##call the proper function
 "$@"

@@ -1,11 +1,7 @@
-#change into python https://blog.nashtechglobal.com/how-to-create-service-using-kubernetes-python-client/
-#https://github.com/kubernetes-client/python/tree/master/examples
-DEST_APPS=/tmp/apps
-APP_PORT=80
-#DEST_IMAGE=/tmp/imgs
-#DEST_IMAGE=/var/lib/rancher/k3s/agent/images/
+APP_PORT=8080
+
 function deploy_app(){
-    app=$1
+    export app=$1
     DEST_IMAGE=$2
     DEST_APPS=$3
     cp $DEST_APPS/$app/*.tar $DEST_IMAGE
@@ -13,10 +9,20 @@ function deploy_app(){
     kubectl apply -f $DEST_APPS/$app -n $app
     #kubectl rollout status deployment/$app -n $app --timeout=1m
     kubectl expose deployment $app --port=$APP_PORT -n $app
-    kubectl create ingress $app --rule=/$app*=$app:$APP_PORT -n $app
+
+echo "apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix
+  namespace: ${app}
+spec:
+  stripPrefixRegex:
+    regex:
+    - ^/[^/]+" | kubectl apply -f -
+
     kubectl create ingress $app \
     --rule=/$app*=$app:$APP_PORT -n $app --class=traefik \
-    --annotation traefik.ingress.kubernetes.io/router.entrypoints=web
+    --annotation traefik.ingress.kubernetes.io/router.middlewares=$app-strip-prefix@kubernetescrd
     echo "app installed"
     exit 0
 }

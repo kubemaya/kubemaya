@@ -6,6 +6,7 @@ function delete(){
     kubectl delete -f $DEST_APPS/$app -n $app
     kubectl delete ns $app &
     rm -R $DEST_APPS/$app
+    rm -R $DEST_IMAGE/$app.tar
 }
 
 "$@"

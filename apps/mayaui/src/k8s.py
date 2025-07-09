@@ -1,3 +1,5 @@
+#change into python https://blog.nashtechglobal.com/how-to-create-service-using-kubernetes-python-client/
+#https://github.com/kubernetes-client/python/tree/master/examples
 from kubernetes import client, config
 from nicegui import events,ui
 from kubernetes.client.rest import ApiException
