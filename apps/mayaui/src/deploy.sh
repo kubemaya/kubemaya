@@ -13,7 +13,10 @@ function deploy_app(){
     kubectl apply -f $DEST_APPS/$app -n $app
     #kubectl rollout status deployment/$app -n $app --timeout=1m
     kubectl expose deployment $app --port=$APP_PORT -n $app
-    kubectl create ingress $app --rule=/$app=$app:$APP_PORT -n $app
+    kubectl create ingress $app --rule=/$app*=$app:$APP_PORT -n $app
+    kubectl create ingress $app \
+    --rule=/$app*=$app:$APP_PORT -n $app --class=traefik \
+    --annotation traefik.ingress.kubernetes.io/router.entrypoints=web
     echo "app installed"
     exit 0
 }

@@ -12,6 +12,14 @@ if [ -z "$K3S_ARCH" ]; then
     export K3S_ARCH=arm64
 fi
 
+function get_interface_ip_address(){
+  interfaces=$(ls -U /sys/class/net | head -4)
+  interface=$(gum choose $interfaces)
+  echo "Selected interface $interface"
+
+  ip addr show $interface | grep 'inet ' | awk '{print $2}' | cut -d/ -f1
+}
+
 function createDockerfile(){
   rm apps/$1/src/Dockerfile
 echo '
@@ -157,7 +165,7 @@ function install-k8s-packages(){
 function install-dep(){
   echo "Installing Gum first"
   sudo apt-get update
-  sudo apt-get install -y gpg git
+  sudo apt-get install -y gpg git curl
   gum-install
   sleep 5
   spinner "Installing missing dependencies..." "sudo /bin/bash /opt/k3s/scripts/kubemaya.sh install-k8s-packages"

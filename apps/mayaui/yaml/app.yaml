@@ -70,6 +70,10 @@ spec:
     spec:
       serviceAccountName: mayaui
       volumes:
+      - hostPath:
+          path: /sys/class/net
+          type: ""
+        name: net
       - name: upload
         hostPath:
           path: /tmp/upload
@@ -87,6 +91,8 @@ spec:
         name: mayaui
         resources: {}
         volumeMounts:
+        - mountPath: /app/sys/class/net
+          name: net
         - mountPath: /tmp/upload
           name: upload
         - mountPath: /tmp/apps
@@ -127,9 +133,9 @@ metadata:
   name: nginx
   namespace: kubemaya
   annotations:
-#    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
+  ingressClassName: traefik
   rules:
   - http:
       paths:

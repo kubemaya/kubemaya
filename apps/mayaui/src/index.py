@@ -2,21 +2,13 @@ from nicegui import ui
 from k8s import getAllDeployments
 from upload_app import uploadApp
 from menu_app import showApps
-from device import shutdown,restart,memory,CPU,disk
+from device import shutdown,restart,memory,CPU,disk,interfaces
 from command import cli
 import os
 
 def del_app():
     os.system("/bin/sh delete.sh delete "+i.value)
     ui.notify("Deleted Deployment "+i.value,position="top",type="positive")
-
-@ui.page('/login')
-def page1():
-    ui.label('page1')
-
-@ui.page('/page2', dark=True)
-def page2():
-    ui.label('page2')
 
 with ui.tabs() as tabs:
     ui.tab('apps', label='Apps', icon='widgets')
@@ -54,6 +46,7 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
         memory()
         CPU()
         disk()
+        interfaces()
         ui.html('<strong>Device Operations</strong>')
         with ui.button_group():
             ui.button("Restart", on_click=lambda: restart(),color="amber")

@@ -9,6 +9,16 @@ def shutdown():
 def restart():
     os.system("sudo reboot")
 
+def interfaces():
+    os.system("/bin/sh interfaces.sh get_interfaces")
+    ui.label("Interfaces available")
+    with ui.row():
+        with open('/app/interfaces', 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                result = line.split(',')
+                ui.label("Interface: "+result[0]+" IP Address: "+result[1])
+
 @ui.refreshable
 def memory():
     #print("CPU usage (%):", psutil.cpu_percent(interval=1))
