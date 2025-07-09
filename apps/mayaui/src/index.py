@@ -46,7 +46,7 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
         memory()
         CPU()
         disk()
-        interfaces()
+        #interfaces()
         ui.html('<strong>Device Operations</strong>')
         with ui.button_group():
             ui.button("Restart", on_click=lambda: restart(),color="amber")
