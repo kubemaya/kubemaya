@@ -60,8 +60,13 @@ from flask import jsonify
 app = Flask(__name__)
 
 @app.route("/_health", methods=["GET"])
-def getTotal(bid):
+def getHealth():
     data = {"response":"OK"}
+    return jsonify(data)
+
+@app.route("/", methods=["GET"])
+def index():
+    data = {"response":"It works"}
     return jsonify(data)
 
 if __name__ == '__main__':
