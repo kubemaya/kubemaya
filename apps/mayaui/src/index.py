@@ -6,8 +6,11 @@ from device import shutdown,restart,memory,CPU,disk,interfaces,swap
 from command import cli
 import os
 
+DEST_APPS="/tmp/apps/" if os.environ["DEST_APPS"]==None else os.environ["DEST_APPS"]
+DEST_IMAGE="/tmp/imgs/" if os.environ["DEST_IMAGE"]==None else os.environ["DEST_IMAGE"]
+
 def del_app():
-    os.system("/bin/sh delete.sh delete "+i.value)
+    os.system("/bin/sh delete.sh delete "+i.value+" "+DEST_IMAGE+" "+DEST_APPS)
     ui.notify("Deleted Deployment "+i.value,position="top",type="positive")
 
 with ui.tabs() as tabs:

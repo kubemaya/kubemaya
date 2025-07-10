@@ -87,11 +87,11 @@ spec:
         name: net
       - name: upload
         hostPath:
-          path: /tmp/upload
+          path: /app/upload
           type: DirectoryOrCreate
       - name: apps
         hostPath:
-          path: /tmp/apps
+          path: /app/apps
           type: DirectoryOrCreate
       - name: images
         hostPath:
@@ -110,19 +110,19 @@ spec:
           name: proc-sysrq-trigger
         - mountPath: /app/sys/class/net
           name: net
-        - mountPath: /tmp/upload
+        - mountPath: /app//upload
           name: upload
-        - mountPath: /tmp/apps
+        - mountPath: /app/apps
           name: apps
-        - mountPath: /tmp/images
+        - mountPath: /app/images
           name: images
         env:
         - name: DEST_UPLOAD
-          value: "/tmp/upload/"
+          value: "/app/upload/"
         - name: DEST_APPS
-          value: "/tmp/apps/"
+          value: "/app/apps/"
         - name: DEST_IMAGE
-          value: "/tmp/images/"
+          value: "/app/images/"
 status: {}
 ---
 apiVersion: v1
