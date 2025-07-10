@@ -38,7 +38,7 @@ nginx 1.17.5-alpine linux/arm64/v8
 ```
 **Note:** To override to a different architecture than arm64, use the variable K3S_ARCH=<amd64,etc>. Also, you have to start docker before run it.   
 ```
-K3S_ARCH=SOME_VALUE /bin/bash kubemaya.sh gen-installer
+K3S_ARCH=amd64 /bin/bash kubemaya.sh gen-installer
 ```
 7. Copy the k3s_airgapped_installer.tgz to a USB storage
 

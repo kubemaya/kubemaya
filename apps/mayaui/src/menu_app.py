@@ -1,8 +1,7 @@
 import os
 from nicegui import ui
 
-DEST_APPS="/tmp/apps"
-#HOST="http://192.168.0.100"
+DEST_APPS="/tmp/apps/" if os.environ["DEST_APPS"]==None else os.environ["DEST_APPS"]
 
 def openApp(e):
     ui.navigate.to('/'+e.sender.text,new_tab=True)
