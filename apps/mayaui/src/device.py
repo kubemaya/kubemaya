@@ -21,18 +21,21 @@ def interfaces():
 
 @ui.refreshable
 def memory():
-    #print("CPU usage (%):", psutil.cpu_percent(interval=1))
     ram = psutil.virtual_memory()
-    #print("RAM usage (%):", ram.percent)
-    #print("RAM used (GB):", round(ram.used / 1e9, 2))
     with ui.row().classes('items-center'):
         ui.circular_progress(value=ram.percent,min=0,max=100)
         ui.label('Memory')
 
 @ui.refreshable
+def swap():
+    swap_m = psutil.virtual_memory()
+    with ui.row().classes('items-center'):
+        ui.circular_progress(value=swap_m.percent,min=0,max=100)
+        ui.label('Swap')
+
+@ui.refreshable
 def CPU():
     cpu = psutil.cpu_percent(interval=1)
-    #print("CPU usage (%):", cpu)
     with ui.row().classes('items-center'):
         ui.circular_progress(value=cpu,min=0,max=100)
         ui.label('CPU')

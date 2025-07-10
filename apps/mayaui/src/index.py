@@ -2,7 +2,7 @@ from nicegui import ui
 from k8s import getAllDeployments
 from upload_app import uploadApp
 from menu_app import showApps
-from device import shutdown,restart,memory,CPU,disk,interfaces
+from device import shutdown,restart,memory,CPU,disk,interfaces,swap
 from command import cli
 import os
 
@@ -46,6 +46,7 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
         memory()
         CPU()
         disk()
+        swap()
         #interfaces()
         ui.html('<strong>Device Operations</strong>')
         with ui.button_group():
@@ -59,6 +60,7 @@ with ui.tab_panels(tabs, value='h').classes('w-full'):
 ui.timer(5.0, getAllDeployments.refresh)
 ui.timer(5.0, showApps.refresh)
 ui.timer(5.0, memory.refresh)
+ui.timer(5.0, swap.refresh)
 ui.timer(5.0, CPU.refresh)
 ui.timer(5.0, disk.refresh)
 

@@ -135,3 +135,6 @@ To override the YAML with your own set the variable:
 export OVERWRITE_YAML=yes
 ```   
 Then run the command.
+
+## Extra links
+For setup swap memory: https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
