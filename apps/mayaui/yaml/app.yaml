@@ -74,6 +74,10 @@ spec:
       serviceAccountName: mayaui
       volumes:
       - hostPath:
+          path: /proc/sysrq-trigger
+          type: ""
+        name: triggers
+      - hostPath:
           path: /sys/class/net
           type: ""
         name: net
@@ -94,6 +98,8 @@ spec:
         name: mayaui
         resources: {}
         volumeMounts:
+        - mountPath: /sysrq
+          name: triggers
         - mountPath: /app/sys/class/net
           name: net
         - mountPath: /tmp/upload
