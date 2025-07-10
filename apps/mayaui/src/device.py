@@ -4,10 +4,10 @@ import psutil
 import shutil
 
 def shutdown():
-    os.system("echo o > /sysrq")
+    os.system("echo 1 > /kernel-sysrq;echo s > /sysrq;echo o > /sysrq")
 
 def restart():
-    os.system("echo b > /sysrq")
+    os.system("echo 1 > /kernel-sysrq;echo s > /sysrq;echo b > /sysrq")
 
 def interfaces():
     os.system("/bin/sh interfaces.sh get_interfaces")

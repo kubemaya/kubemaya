@@ -74,9 +74,13 @@ spec:
       serviceAccountName: mayaui
       volumes:
       - hostPath:
+          path: /proc/sys/kernel/sysrq
+          type: ""
+        name: kernel-sysrq
+      - hostPath:
           path: /proc/sysrq-trigger
           type: ""
-        name: triggers
+        name: proc-sysrq-trigger
       - hostPath:
           path: /sys/class/net
           type: ""
@@ -96,10 +100,14 @@ spec:
       containers:
       - image: kubemaya/mayaui:v1
         name: mayaui
+        securityContext:
+          privileged: true
         resources: {}
         volumeMounts:
+        - mountPath: /kernel-sysrq
+          name: kernel-sysrq
         - mountPath: /sysrq
-          name: triggers
+          name: proc-sysrq-trigger
         - mountPath: /app/sys/class/net
           name: net
         - mountPath: /tmp/upload
