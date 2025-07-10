@@ -6,3 +6,4 @@ save-images.sh
 zot*
 k3s*
 install.sh
+releases/

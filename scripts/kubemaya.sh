@@ -226,7 +226,7 @@ function gen-installer(){
   fi
   chmod +x install.sh
   echo "Packing installer components"
-  tar --exclude='./apps' --exclude='./package' -vzcf k3s_airgapped_installer.tgz $(ls)
+  tar --exclude='./apps' --exclude='./package' --exclude='releases' -vzcf k3s_airgapped_installer.tgz $(ls)
   sleep 5
   echo "Done"
   echo "Running cleanup"
@@ -414,7 +414,7 @@ function k3s-install(){
 
   #set-network
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
-    spinner "Setting Wifi" "/bin/bash installer.sh set-wifi"
+    spinner "Setting Wifi" "/bin/bash ./scripts/kubemaya.sh set-wifi"
     write_st "Wifi Configured"
     spinner "Waiting for wifi connection" "sleep 10"
     write_st "Wifi Ready"
