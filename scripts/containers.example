@@ -1,0 +1,13 @@
+busybox 1.37.0 linux/arm64/v8
+redis 8.0.0-alpine3.21 linux/arm64/v8
+nginx 1.17.5-alpine linux/arm64/v8
+grafana ß8.4.4 linux/arm64/v8
+mongo 8.0.11 linux/arm64/v8
+kourier gcr.io/knative-releases/knative.dev/net-kourier/cmd/kourier@sha256:15a601147ef4574386e296c4b2456bb1e230d2dc110254295dddb56e5118b5a8 linux/arm64/v8
+envoy docker.io/envoyproxy/envoy:v1.34-latest linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d0be939fdfb469e52e999eb65f39466d18f029984a782affa26322c9fec6db78 linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d0be939fdfb469e52e999eb65f39466d18f029984a782affa26322c9fec6db78 linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/activator@sha256:031408ec516f374636a77ce1c689accfcfa13154abfef96716e636405f64464c linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler@sha256:3502bb5aa60f485ec702f98f0391fa54d91a30e905a1b7ad0adddcd31205c79c linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/controller@sha256:5b93308a392c00381f0ac48e7f55806bce7b4d30c34cf399fc7dae3ec538b23d linux/arm64/v8
+gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256:50831d9aaa69c4d2a8277d35650d3e2ad4832b4a04c0a089e715fd190fd8c273 linux/arm64/v8

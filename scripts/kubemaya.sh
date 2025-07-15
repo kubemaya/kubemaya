@@ -183,7 +183,7 @@ function clean(){
   rm *.tgz
   rm -R images
   rm k3s-airgap-images-$K3S_ARCH.tar
-  rm zot-linux-$K3S_ARCH
+  #rm zot-linux-$K3S_ARCH
   rm install.sh
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
     rm k3s-$K3S_ARCH
@@ -206,8 +206,8 @@ function gen-installer(){
   rm install.sh k3s-$K3S_ARCH k3s-airgap-images-$K3S_ARCH.tar
   save-images
   build-mayaui
-  echo "Downloading Zot Registry"
-  curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
+  #echo "Downloading Zot Registry"
+  #curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
     curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-$K3S_ARCH
@@ -237,7 +237,7 @@ function gen-installer(){
     rm k3s
   fi
   rm save-images.sh
-  rm zot-linux-$K3S_ARCH
+  #rm zot-linux-$K3S_ARCH
   rm -R images
   rm install.sh
   echo "Now copy the k3s_airgapped_installer.tgz to your device :)"
@@ -407,8 +407,8 @@ function k3s-install(){
   else
     write_st "When Hotspot skipped, be sure to have a network configuration"
   fi
-  write_line "Do you want to install a local Zot container registry (y/n)"
-  read_var ZOT_INSTALL "n"
+  #write_line "Do you want to install a local Zot container registry (y/n)"
+  #read_var ZOT_INSTALL "n"
   write_line "Extra parameters for K3s"
   read_var K3S_EXTRA_PARS " "
 
@@ -420,11 +420,11 @@ function k3s-install(){
     write_st "Wifi Ready"
     write_st "Preparing installation"
   fi
-  if [[ "$ZOT_INSTALL" == *"y"* ]]; then
-    write_st "Zot will be installed"
-    zot-install
-  else
-    echo "Zot installation skipped"
+  #if [[ "$ZOT_INSTALL" == *"y"* ]]; then
+  #  write_st "Zot will be installed"
+  #  zot-install
+  #else
+  #  echo "Zot installation skipped"
   fi
   write_st "Installing K3s"
   cd /opt/k3s
