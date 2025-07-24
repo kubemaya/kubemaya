@@ -360,11 +360,11 @@ function save-images(){
   mkdir images
   rm save-images.sh
 echo "function save-image(){
-  IMG=\$1
-  VERSION=\$2
+  TAR_NAME=\$1
+  IMG=\$2
   ARCH=\$3
-  docker pull \$IMG:\$VERSION --platform \$ARCH
-  docker save \$IMG:\$VERSION > images/\$IMG.tar
+  docker pull \$IMG --platform \$ARCH
+  docker save \$IMG > images/\$TAR_NAME.tar
 }" >> save-images.sh
 
   cat scripts/containers | awk '{print "save-image "$1,$2,$3;}' >> save-images.sh
@@ -379,6 +379,7 @@ function install-mayaui(){
   sudo tar -xzvf /opt/k3s/mayaui.tgz -C /opt/k3s/mayaui
   sudo mv /opt/k3s/mayaui/mayaui.tar /var/lib/rancher/k3s/agent/images
   sudo mv /opt/k3s/mayaui/app.yaml /var/lib/rancher/k3s/server/manifests
+  sudo mv /opt/k3s/mayaui/*.yaml /var/lib/rancher/k3s/server/manifests
 }
 
 function k3s-install(){
@@ -425,7 +426,7 @@ function k3s-install(){
   #  zot-install
   #else
   #  echo "Zot installation skipped"
-  fi
+  #fi
   write_st "Installing K3s"
   cd /opt/k3s
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 

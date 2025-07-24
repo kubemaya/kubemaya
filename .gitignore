@@ -9,3 +9,5 @@ install.sh
 releases/
 camera/
 edge1/
+containers
+demo*
