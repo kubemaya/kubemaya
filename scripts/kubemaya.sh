@@ -379,7 +379,7 @@ function install-mayaui(){
   sudo tar -xzvf /opt/k3s/mayaui.tgz -C /opt/k3s/mayaui
   sudo mv /opt/k3s/mayaui/mayaui.tar /var/lib/rancher/k3s/agent/images
   sudo mv /opt/k3s/mayaui/app.yaml /var/lib/rancher/k3s/server/manifests
-  sudo mv /opt/k3s/mayaui/*.yaml /var/lib/rancher/k3s/server/manifests
+  sudo cp /opt/k3s/scripts/default/*.yaml /var/lib/rancher/k3s/server/manifests
 }
 
 function k3s-install(){
