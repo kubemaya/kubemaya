@@ -416,7 +416,7 @@ function k3s-install(){
   #write_line "Do you want to install a local Zot container registry (y/n)"
   #read_var ZOT_INSTALL "n"
   write_line "Extra parameters for K3s"
-  read_var K3S_EXTRA_PARS " "
+  read_var K3S_EXTRA_PARS "--disable=metrics-server"
 
   #set-network
   if [[ "$HOTSPOT_INSTALL" == *"y"* ]]; then
@@ -449,7 +449,7 @@ function k3s-install(){
 ## For agents
 ##  INSTALL_K3S_SKIP_DOWNLOAD=true K3S_URL=https://$MASTER_NODE_IP_OR_FQDN:6443 K3S_TOKEN=$TOKEN_TO_USE ./install.sh
   write_st "Installing K3s"
-  sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" $K3S_EXTRA_PARS ./install.sh
+  sudo INSTALL_K3S_SKIP_DOWNLOAD=true K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="$K3S_EXTRA_PARS" ./install.sh
   write_emo "K3s installation done - check output for error :smile:"
   write_st "Installing MayaUI"
   install-mayaui
