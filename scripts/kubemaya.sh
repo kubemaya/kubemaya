@@ -34,6 +34,11 @@ EXPOSE 8080
 CMD ["ash", "-c", "python index.py"]' > apps/$1/src/Dockerfile
 }
 
+function error_alert(){
+  echo "Error detected, process stopped"
+  exit 1
+}
+
 function build-mayaui(){
   echo "Packaging kubemaya"
   export OVERWRITE_YAML=yes
@@ -210,14 +215,14 @@ function gen-installer(){
   #curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
-    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-$K3S_ARCH
+    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-$K3S_ARCH || error_alert
   else
-    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s
+    curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s || error_alert
   fi
   echo  "Download K3s install.sh script"
   curl -#L  https://get.k3s.io -o install.sh
   echo "Downloading airgap images"
-  curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-airgap-images-$K3S_ARCH.tar
+  curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-airgap-images-$K3S_ARCH.tar || error_alert
   echo "setting permissions to k3s and install.sh"
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
     chmod +x k3s-$K3S_ARCH

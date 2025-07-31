@@ -18,7 +18,6 @@ metadata:
   name: mayaui-cluster-role
   namespace: kubemaya
 rules:
-rules:
   - apiGroups: ["traefik.io"]
     resources: ["middlewares"]
     verbs: ["*"]
@@ -110,7 +109,7 @@ spec:
           name: proc-sysrq-trigger
         - mountPath: /app/sys/class/net
           name: net
-        - mountPath: /app//upload
+        - mountPath: /app/upload
           name: upload
         - mountPath: /app/apps
           name: apps
