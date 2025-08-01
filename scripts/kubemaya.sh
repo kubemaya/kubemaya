@@ -171,7 +171,8 @@ nmcli con up $HOTSPOT_NAME
 
 function install-k8s-packages(){
   sudo export DEBIAN_FRONTEND=noninteractive
-  sudo apt-get install -y dialog nano gpg curl iptables-persistent skopeo
+  sudo apt-get install -y dialog nano gpg curl iptables-persistent skopeo autofs
+  sudo systemctl enable ssh
 }
 
 function install-dep(){

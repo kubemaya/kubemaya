@@ -67,4 +67,14 @@ ui.timer(5.0, swap.refresh)
 ui.timer(5.0, CPU.refresh)
 ui.timer(5.0, disk.refresh)
 
-ui.run(host='0.0.0.0', port=8080, title='KubeMaya')
+#ui.run(host='0.0.0.0', port=8080, title='KubeMaya')
+os.environ["UVICORN_WORKERS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+ui.label(f'test')
+ui.run(
+reload=False,
+native=False,
+uvicorn_logging_level='warning',
+show=False,  # prevents chromium injection
+port=8080,
+title='KubeMaya')

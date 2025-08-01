@@ -97,11 +97,18 @@ spec:
           path: /var/lib/rancher/k3s/agent/images
           type: DirectoryOrCreate
       containers:
+
       - image: kubemaya/mayaui:v1
         name: mayaui
         securityContext:
           privileged: true
-        resources: {}
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "750m"        
         volumeMounts:
         - mountPath: /kernel-sysrq
           name: kernel-sysrq
