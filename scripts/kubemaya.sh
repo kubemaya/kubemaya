@@ -283,6 +283,28 @@ function zot-install(){
   configure-zot
 }
 
+function configure-executor(){
+echo "Configuring Executor"
+sudo mkdir -p /app/shell
+echo "echo 'Running KubeMaya Executor for the First Time'" > /app/shell/script.sh
+sudo echo '
+[Unit]
+Description=KubeMaya Executor
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "while true; do [ -e '/app/shell/script.sh' ] && (echo 'KubeMaya Executor: Running script.sh';cp /app/shell/script.sh /app/shell/run-script.sh;rm /app/shell/script.sh;/bin/bash /app/shell/run-script.sh) || echo 'KubeMaya Executor: Nothing to run';sleep 10; done"
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/km-executor.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable km-executor
+sudo systemctl start km-executor
+}
+
+
 function configure-zot(){
 echo "Configuring Zot"
 sudo mkdir /etc/zot
@@ -433,6 +455,7 @@ function k3s-install(){
   #else
   #  echo "Zot installation skipped"
   #fi
+  spinner "Setting KubeMaya Executor" "/bin/bash ./scripts/kubemaya.sh configure-executor"
   write_st "Installing K3s"
   cd /opt/k3s
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 
