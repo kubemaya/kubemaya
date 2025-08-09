@@ -43,7 +43,8 @@ function build-mayaui(){
   echo "Packaging kubemaya"
   export OVERWRITE_YAML=yes
   export OVERWRITE_DOCKERFILE=yes
-  package kubemaya mayaui v1 $K3S_ARCH
+  export OVERWRITE_ARCH=yes
+  package kubemaya mayaui v1 --build-arg TARGETARCH=$K3S_ARCH
   mv package/mayaui.tgz .
 }
 
@@ -90,6 +91,7 @@ function package(){
     IMAGE_NAME=$2
     IMAGE_TAG=$3
     PLATFORM=$4
+    ARG=$5
     DEST=package/$IMAGE_NAME
     echo "building for $PLATFORM"
     mkdir -p $DEST
@@ -100,7 +102,11 @@ function package(){
       createDockerfile $IMAGE_NAME
     fi
     cd apps/$IMAGE_NAME/src
-    docker build  -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
+    if [[ "$OVERWRITE_ARCH" == *"y"* ]]; then
+      docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG $PLATFORM $ARG .
+    else
+      docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
+    fi
     echo $(pwd)
     docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
     if [[ "$OVERWRITE_YAML" == *"y"* ]]; then
