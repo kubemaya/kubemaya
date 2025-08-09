@@ -3,7 +3,7 @@
     <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
       <q-toolbar>
         <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
-        <q-toolbar-title>KAMIDAR</q-toolbar-title>
+        <q-toolbar-title>KUBEMAYA</q-toolbar-title>
       </q-toolbar>
     </q-header>
 

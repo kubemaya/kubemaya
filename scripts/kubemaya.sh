@@ -211,7 +211,7 @@ function gen-installer(){
   fi
   rm install.sh k3s-$K3S_ARCH k3s-airgap-images-$K3S_ARCH.tar
   save-images
-  build-mayaui
+  build-mayaui || error_alert
   #echo "Downloading Zot Registry"
   #curl -#LO https://github.com/project-zot/zot/releases/download/$ZOT_VERSION/zot-linux-$K3S_ARCH
   echo "Downloading K3s binary"
