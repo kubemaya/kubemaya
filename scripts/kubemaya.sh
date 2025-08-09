@@ -232,7 +232,7 @@ function gen-installer(){
   fi
   chmod +x install.sh
   echo "Packing installer components"
-  tar --exclude='./apps' --exclude='./package' --exclude='releases' -vzcf k3s_airgapped_installer.tgz $(ls)
+  tar --exclude='apps' --exclude='package' --exclude='releases' -vzcf k3s_airgapped_installer.tgz $(ls)
   sleep 5
   echo "Done"
   echo "Running cleanup"

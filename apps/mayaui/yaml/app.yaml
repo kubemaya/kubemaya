@@ -88,6 +88,10 @@ spec:
         hostPath:
           path: /app/upload
           type: DirectoryOrCreate
+      - name: shell
+        hostPath:
+          path: /app/shell
+          type: DirectoryOrCreate
       - name: apps
         hostPath:
           path: /app/apps
@@ -97,7 +101,6 @@ spec:
           path: /var/lib/rancher/k3s/agent/images
           type: DirectoryOrCreate
       containers:
-
       - image: kubemaya/mayaui:v1
         name: mayaui
         securityContext:
@@ -105,10 +108,10 @@ spec:
         resources:
           requests:
             memory: "64Mi"
-            cpu: "250m"
+            cpu: "50m"
           limits:
-            memory: "1Gi"
-            cpu: "750m"        
+            memory: "250Mi"
+            cpu: "250m"
         volumeMounts:
         - mountPath: /kernel-sysrq
           name: kernel-sysrq
@@ -118,6 +121,8 @@ spec:
           name: net
         - mountPath: /app/upload
           name: upload
+        - mountPath: /app/shell
+          name: shell
         - mountPath: /app/apps
           name: apps
         - mountPath: /app/images
@@ -158,7 +163,7 @@ metadata:
   annotations:
 #    traefik.ingress.kubernetes.io/router.entrypoints: web
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"    
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
   ingressClassName: traefik
   rules:
