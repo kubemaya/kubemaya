@@ -93,7 +93,6 @@ function package(){
     PLATFORM=$4
     ARG=$5
     DEST=package/$IMAGE_NAME
-    echo "building for $PLATFORM"
     mkdir -p $DEST
     if [[ "$OVERWRITE_DOCKERFILE" == *"y"* ]]; then
       echo "Overwriting with a custom file Dockerfile"
@@ -103,8 +102,10 @@ function package(){
     fi
     cd apps/$IMAGE_NAME/src
     if [[ "$OVERWRITE_ARCH" == *"y"* ]]; then
+      echo "building for $ARG"
       docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG $PLATFORM $ARG .
     else
+      echo "building for $PLATFORM"    
       docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     fi
     echo $(pwd)
