@@ -12,6 +12,42 @@ if [ -z "$K3S_ARCH" ]; then
     export K3S_ARCH=arm64
 fi
 
+function deploy_app() {
+    export app=$1
+    DEST_IMAGE=/var/lib/rancher/k3s/agent/images
+    DEST_APPS=/app/apps
+    APP_PORT=$2
+    mkdir -p $DEST_APPS/$app
+    tar -xzvf $1.tgz -C $DEST_APPS/$app
+    cp $DEST_APPS/$app/*.tar $DEST_IMAGE
+    
+#REGULAR INSTALLATION
+    kubectl create ns $app
+    kubectl apply -f $DEST_APPS/$app -n $app
+    #kubectl rollout status deployment/$app -n $app --timeout=1m
+    kubectl expose deployment $app --port=$APP_PORT -n $app
+
+echo "apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix
+  namespace: ${app}
+spec:
+  stripPrefixRegex:
+    regex:
+    - ^/[^/]+" | kubectl apply -f -
+
+    kubectl create ingress $app \
+    --rule=/$app*=$app:$APP_PORT -n $app --class=traefik \
+    --annotation traefik.ingress.kubernetes.io/router.middlewares=$app-strip-prefix@kubernetescrd
+#CUSTOM INSTALLATION
+#    kubectl apply -f $DEST_APPS/$app
+    echo "app installed"
+    exit 0
+}
+
+
+
 function get_interface_ip_address(){
   interfaces=$(ls /sys/class/net | head -4)
   interface=$(gum choose $interfaces)
