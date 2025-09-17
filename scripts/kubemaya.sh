@@ -17,6 +17,8 @@ function deploy_app() {
     DEST_IMAGE=/var/lib/rancher/k3s/agent/images
     DEST_APPS=/app/apps
     APP_PORT=$2
+    rm -R $DEST_APPS/$app || echo "No directory to delete"
+    sudo rm $DEST_IMAGE/$app.tar || echo "No tar image to delete"
     mkdir -p $DEST_APPS/$app
     tar -xzvf $1.tgz -C $DEST_APPS/$app
     cp $DEST_APPS/$app/*.tar $DEST_IMAGE
@@ -139,10 +141,10 @@ function package(){
     cd apps/$IMAGE_NAME/src
     if [[ "$OVERWRITE_ARCH" == *"y"* ]]; then
       echo "building for $ARG"
-      docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG $PLATFORM $ARG .
+      docker buildx build --no-cache -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG $PLATFORM $ARG .
     else
       echo "building for $PLATFORM"    
-      docker buildx build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
+      docker buildx build --no-cache -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG . --platform linux/$PLATFORM
     fi
     echo $(pwd)
     docker save $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG > ../../../$DEST/$IMAGE_NAME.tar
