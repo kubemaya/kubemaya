@@ -21,6 +21,27 @@
               @click="restartDeployment(props.row.namespace, props.row.name)"
             />
             <q-btn
+              color="warning"
+              label="Pause"
+              size="sm"
+              class="q-mr-sm"
+              @click="pauseDeployment(props.row.namespace, props.row.name)"
+            />  
+            <q-btn
+              color="warning"
+              label="Resume"
+              size="sm"
+              class="q-mr-sm"
+              @click="resumeDeployment(props.row.namespace, props.row.name)"
+            />                      
+            <q-btn
+              color="info"
+              label="Logs"
+              size="sm"
+              class="q-mr-sm"
+              @click="showLogs(props.row.namespace, props.row.name)"
+            />               
+            <q-btn
               color="negative"
               label="Delete"
               size="sm"
@@ -30,6 +51,39 @@
         </template>
       </q-table>
     </div>
+
+    <!-- Logs Modal -->
+    <q-dialog v-model="logsModal" persistent>
+      <q-card style="min-width: 80vw; min-height: 60vh;">
+        <q-card-section>
+          <div class="text-h6">Deployment Logs</div>
+        </q-card-section>
+        
+        <q-card-section>
+          <q-input
+            v-model="selectedPod"
+            label="Pod"
+            readonly
+            filled
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="deploymentLogs"
+            type="textarea"
+            label="Logs"
+            readonly
+            autogrow
+            filled
+            style="font-family: 'Courier New', Courier, monospace; min-height: 300px;"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Close" color="primary" @click="logsModal = false" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
   </div>
 </template>
 
@@ -44,6 +98,11 @@ export default {
     const deployments = ref([])
     const loading = ref(true)
     const error = ref(null)
+
+    const logsModal = ref(false)
+    const deploymentLogs = ref('')
+    const selectedPod = ref('')
+
     let intervalId = null
 
     const columns = [
@@ -97,6 +156,62 @@ export default {
       }
     }
 
+    async function pauseDeployment(namespace, name) {
+      try {
+        const response = await fetch('/scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ namespace, name, replicas: 0 })
+        })
+        if (!response.ok) throw new Error('Failed to pause deployment')
+        $q.notify({
+          type: 'positive',
+          message: 'Deployment paused'
+        })
+      } catch (err) {
+        $q.notify({
+          type: 'negative',
+          message: 'Error: ' + err.message
+        })
+      }
+    }
+
+    async function resumeDeployment(namespace, name) {
+      try {
+        const response = await fetch('/scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ namespace, name, replicas: 1 })
+        })
+        if (!response.ok) throw new Error('Failed to resume deployment')
+        $q.notify({
+          type: 'positive',
+          message: 'Deployment resumed'
+        })
+      } catch (err) {
+        $q.notify({
+          type: 'negative',
+          message: 'Error: ' + err.message
+        })
+      }
+    }
+
+    async function showLogs(namespace, name) {
+      try {
+        const response = await fetch(`/logs/${namespace}/${name}`)
+        if (!response.ok) throw new Error('Failed to fetch logs')
+        const data = await response.json()
+        deploymentLogs.value = data.logs || ''
+        selectedPod.value = data.pod || ''
+        logsModal.value = true
+      } catch (err) {
+        $q.notify({
+          type: 'negative',
+          message: 'Error: ' + err.message
+        })
+      }
+    }    
+
     function deleteNamespace(namespace) {
       $q.dialog({
         title: 'Confirm',
@@ -128,7 +243,13 @@ export default {
       loading,
       error,
       columns,
+      logsModal,
+      deploymentLogs,
+      selectedPod,
       restartDeployment,
+      pauseDeployment,
+      resumeDeployment,
+      showLogs,
       deleteNamespace
     }
   }

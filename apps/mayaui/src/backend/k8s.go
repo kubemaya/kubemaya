@@ -10,6 +10,8 @@ import (
     "k8s.io/client-go/kubernetes"
     "k8s.io/client-go/rest"
     "k8s.io/client-go/tools/clientcmd"
+    "io"
+    v1 "k8s.io/api/core/v1"
 )
 
 // PodInfo holds basic pod data for the API response
@@ -232,4 +234,98 @@ func GetNonSystemNamespacesHandler(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, namespaces)
+}
+
+// ScaleDeploymentHandler handles POST /scale and scales a deployment to N replicas
+func ScaleDeploymentHandler(c *gin.Context) {
+    var req struct {
+        Namespace string `json:"namespace"`
+        Name      string `json:"name"`
+        Replicas  int32  `json:"replicas"`
+    }
+    if err := c.ShouldBindJSON(&req); err != nil || req.Namespace == "" || req.Name == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Namespace, name and replicas are required"})
+        return
+    }
+
+    clientset, err := getK8sClient()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create k8s client: " + err.Error()})
+        return
+    }
+
+    // Get the deployment
+    deploy, err := clientset.AppsV1().Deployments(req.Namespace).Get(context.Background(), req.Name, metav1.GetOptions{})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get deployment: " + err.Error()})
+        return
+    }
+
+    // Update the replica count
+    deploy.Spec.Replicas = &req.Replicas
+
+    _, err = clientset.AppsV1().Deployments(req.Namespace).Update(context.Background(), deploy, metav1.UpdateOptions{})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not scale deployment: " + err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Deployment scaled", "namespace": req.Namespace, "name": req.Name, "replicas": req.Replicas})
+}
+
+// GetDeploymentLogsHandler handles GET /logs/:namespace/:name and returns the last 30 lines of logs for a deployment
+func GetDeploymentLogsHandler(c *gin.Context) {
+    namespace := c.Param("namespace")
+    name := c.Param("name")
+    
+    if namespace == "" || name == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Namespace and deployment name are required"})
+        return
+    }
+
+    clientset, err := getK8sClient()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create k8s client: " + err.Error()})
+        return
+    }
+
+    // Get pods for the deployment
+    pods, err := clientset.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{
+        LabelSelector: "app=" + name,
+    })
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not list pods: " + err.Error()})
+        return
+    }
+
+    if len(pods.Items) == 0 {
+        c.JSON(http.StatusNotFound, gin.H{"error": "No pods found for deployment"})
+        return
+    }
+
+    // Get logs from the first pod
+    pod := pods.Items[0]
+    tailLines := int64(30)
+    
+    req := clientset.CoreV1().Pods(namespace).GetLogs(pod.Name, &v1.PodLogOptions{
+        TailLines: &tailLines,
+    })
+    
+    logs, err := req.Stream(context.Background())
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get logs: " + err.Error()})
+        return
+    }
+    defer logs.Close()
+
+    logData, err := io.ReadAll(logs)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not read logs: " + err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "logs": string(logData),
+        "pod":  pod.Name,
+    })
 }

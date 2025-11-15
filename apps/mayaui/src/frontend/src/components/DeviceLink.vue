@@ -79,7 +79,8 @@ export default {
       if (!device.value.memory_total) return 0
       return 100 - (device.value.memory_available / device.value.memory_total) * 100
     })
-    const cpuPercent = computed(() => (device.value.cpu_percent * 100) || 0)
+    //const cpuPercent = computed(() => (device.value.cpu_percent * 100) || 0)
+    const cpuPercent = computed(() => parseFloat((device.value.cpu_percent || 0).toFixed(2)))
     const diskPercent = computed(() => {
       if (!device.value.disk_total) return 0
       return 100 - (device.value.disk_free / device.value.disk_total) * 100

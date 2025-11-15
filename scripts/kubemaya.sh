@@ -303,6 +303,15 @@ function scp_device(){
   exit 0
 }
 
+function scp_app(){
+  IP_ADDRESS=$1
+  USER=$2
+  APP=$3
+  echo "Copy files to device ${IP_ADDRESS}"
+  scp $APP $USER@${IP_ADDRESS}:/home/$USER
+  exit 0
+}
+
 function update_installer_file(){
   IP_ADDRESS=$1
   echo "Copy installer.sh to device ${IP_ADDRESS}"

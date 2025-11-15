@@ -29,6 +29,8 @@ func main() {
     router.GET("/apps", GetNonSystemDeploymentsHandler)
     router.GET("/namespaces", GetNonSystemNamespacesHandler)
     router.POST("/upload", UploadHandler)
+    router.POST("/scale", ScaleDeploymentHandler)
+    router.GET("/logs/:namespace/:name", GetDeploymentLogsHandler)    
 
     router.Use(static.Serve("/", static.LocalFile("../frontend/dist/spa", true)))//../frontend/dist/spa
 
