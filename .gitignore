@@ -12,3 +12,6 @@ edge1/
 containers
 demo*
 *.cast
+zarf_experiments/
+test/
+hauler

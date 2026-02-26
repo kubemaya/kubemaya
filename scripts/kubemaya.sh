@@ -5,6 +5,8 @@ HOTSPOT_ADDRESS="192.168.0.100/24"
 HOTSPOT_GATEWAY="192.168.0.1"
 NETWORK_INTERFACE="wlan0"
 HOTSPOT_INSTALL="y"
+#ZARF_VERSION=v0.67.0
+HAULER_VERSION=123
 #OVERWRITE_YAML=n
 #OVERWRITE_DOCKERFILE=n
 
@@ -232,9 +234,11 @@ function install-dep(){
 function clean(){
   echo "starting cleanup"
   rm *.tgz
+  #rm zarf_*
+  #rm zarf-*
   rm -R images
   rm k3s-airgap-images-$K3S_ARCH.tar
-  #rm zot-linux-$K3S_ARCH
+  rm zot-linux-$K3S_ARCH
   rm install.sh
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
     rm k3s-$K3S_ARCH
@@ -246,6 +250,13 @@ function clean(){
   rm -R package
   echo "cleanup done"
 }
+
+#function install-zarf(){
+#  echo "Installing Zarf"
+#  cd /opt/k3s
+#  /bin/bash /opt/k3s/scripts/kubemaya.sh install-zarf
+#}
+
 
 function gen-installer(){
   if docker ps -a; then
@@ -269,6 +280,16 @@ function gen-installer(){
   curl -#L  https://get.k3s.io -o install.sh
   echo "Downloading airgap images"
   curl -#LO https://github.com/k3s-io/k3s/releases/download/$K3S_VERSION/k3s-airgap-images-$K3S_ARCH.tar || error_alert
+
+
+  #echo "Downloading Zarf CLI"
+  ##ZARF_VERSION=$(curl -sIX HEAD https://github.com/zarf-dev/zarf/releases/latest | grep -i ^location: | grep -Eo 'v[0-9]+.[0-9]+.[0-9]+')
+  #curl -#LO "https://github.com/zarf-dev/zarf/releases/download/${ZARF_VERSION}/zarf_${ZARF_VERSION}_Linux_${K3S_ARCH}" -o zarf || error_alert
+  #chmod +x zarf_${ZARF_VERSION}_Linux_${K3S_ARCH}
+
+  #echo "Downloading Zarf Init"
+  #curl -#LO https://github.com/zarf-dev/zarf/releases/download/v0.67.0/zarf-init-${K3S_ARCH}-${ZARF_VERSION}.tar.zst || error_alert
+
   echo "setting permissions to k3s and install.sh"
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
     chmod +x k3s-$K3S_ARCH
@@ -277,7 +298,7 @@ function gen-installer(){
   fi
   chmod +x install.sh
   echo "Packing installer components"
-  tar --exclude='apps' --exclude='package' --exclude='releases' -vzcf k3s_airgapped_installer.tgz $(ls)
+  tar --exclude='apps' --exclude='package' --exclude='releases' --exclude='zarf_experiments' --exclude='test' --exclude='hauler' -vzcf k3s_airgapped_installer.tgz $(ls)
   sleep 5
   echo "Done"
   echo "Running cleanup"
@@ -362,25 +383,68 @@ sudo systemctl start km-executor
 function configure-zot(){
 echo "Configuring Zot"
 sudo mkdir /etc/zot
-sudo echo '
+
+echo 'kubemaya:$2y$05$qXiPfbcGQykAQyEwMaFpj.j8feRS3ZrU2GmPQlze4qHM2P6QdDSCG' | sudo tee /etc/zot/htpasswd >/dev/null
+# Line to add TLS support
+#    "tls": {
+#      "cert": "/etc/letsencrypt/live/zothub.io/fullchain.pem",
+#      "key": "/etc/letsencrypt/live/zothub.io/privkey.pem"
+#    },
+echo '
 {
     "distSpecVersion": "1.1.1",
+    "extensions": {
+        "sync": {
+            "credentialsFile": "",
+            "DownloadDir": "/tmp/zot",
+            "registries": [
+                {
+                  "urls": [
+                    "https://docker.io/library"
+                  ],
+                  "onDemand": true,
+                  "tlsVerify": true,
+                  "maxRetries": 6,
+                  "retryDelay": "5m"
+                },
+                {
+                  "urls": [
+                    "https://cr.l5d.io"
+                  ],
+                  "onDemand": true,
+                  "tlsVerify": true,
+                  "maxRetries": 6,
+                  "retryDelay": "5m"
+                }                
+            ]
+        },    
+        "ui": {
+            "enable": true
+        },
+        "search": {
+            "enable": true
+        }
+    },
     "storage": {
         "rootDirectory": "/tmp/zot"
     },
-    "http": {
-        "address": "127.0.0.1",
-        "port": "8080"
-    },
-    "log": {
-        "level": "debug"
+    "http":
+    {
+        "address": "0.0.0.0",
+        "port": "5000",
+        "auth": {
+            "htpasswd": {
+                "path": "/etc/zot/htpasswd"
+            }
+        }
     }
-}' > config.json
-sudo mv ./config.json /etc/zot/config.json
+}' | sudo tee /etc/zot/config.json >/dev/null
 
-sudo echo '
+#sudo mv ./config.json /etc/zot/config.json
+
+echo '
 [Unit]
-Description=OCI Distribution Registry
+Description=Zot OCI Registry
 Documentation=https://zotregistry.dev/
 After=network.target auditd.service local-fs.target
 
@@ -395,8 +459,10 @@ MemoryHigh=30G
 MemoryMax=32G
 
 [Install]
-WantedBy=multi-user.target' > zot.service
-sudo mv ./zot.service /etc/systemd/system/zot.service
+WantedBy=multi-user.target' > sudo tee /etc/systemd/system/zot.service >/dev/null
+
+
+#sudo mv ./zot.service /etc/systemd/system/zot.service
 
 sudo adduser --no-create-home --disabled-password --gecos --disabled-login zot
 
@@ -444,12 +510,12 @@ function save-images(){
 echo "function save-image(){
   TAR_NAME=\$1
   IMG=\$2
-  ARCH=\$3
+  ARCH=\$(echo \$3 | tr -d '\r')
   docker pull \$IMG --platform \$ARCH
   docker save \$IMG > images/\$TAR_NAME.tar
 }" >> save-images.sh
 
-  cat scripts/containers | awk '{print "save-image "$1,$2,$3;}' >> save-images.sh
+  cat scripts/containers_$K3S_ARCH | awk '{print "save-image "$1,$2,$3;}' >> save-images.sh || echo "No containers file found"
   sleep 2s
   echo "Downloading container images"
   /bin/bash save-images.sh
@@ -459,9 +525,10 @@ echo "function save-image(){
 function install-mayaui(){
   sudo mkdir /opt/k3s/mayaui
   sudo tar -xzvf /opt/k3s/mayaui.tgz -C /opt/k3s/mayaui
-  sudo mv /opt/k3s/mayaui/mayaui.tar /var/lib/rancher/k3s/agent/images
-  sudo mv /opt/k3s/mayaui/app.yaml /var/lib/rancher/k3s/server/manifests
-  sudo cp /opt/k3s/scripts/default/*.yaml /var/lib/rancher/k3s/server/manifests
+  sleep 10
+  sudo cp /opt/k3s/mayaui/mayaui.tar /var/lib/rancher/k3s/agent/images
+  sudo cp /opt/k3s/mayaui/app.yaml /var/lib/rancher/k3s/server/manifests/app.yaml
+  sudo cp /opt/k3s/scripts/default_$K3S_ARCH/*.yaml /var/lib/rancher/k3s/server/manifests/
 }
 
 function k3s-install(){
@@ -502,6 +569,10 @@ function k3s-install(){
     spinner "Waiting for wifi connection" "sleep 10"
     write_st "Wifi Ready"
     write_st "Preparing installation"
+  else
+    write_st "Configuring dummy Interface..."
+    set-network
+    write_st "Dummy Interface configured"
   fi
   #if [[ "$ZOT_INSTALL" == *"y"* ]]; then
   #  write_st "Zot will be installed"
@@ -512,6 +583,11 @@ function k3s-install(){
   spinner "Setting KubeMaya Executor" "/bin/bash ./scripts/kubemaya.sh configure-executor"
   write_st "Installing K3s"
   cd /opt/k3s
+  
+  write_st "Installing Zarf CLI"
+  #sudo mv zarf_${ZARF_VERSION}_Linux_${K3S_ARCH} /usr/local/bin/zarf
+  #sudo chmod +x /usr/local/bin/zarf
+
   sudo mkdir -p /var/lib/rancher/k3s/agent/images/ 
   sudo mkdir -p /usr/local/bin/
   if [[ "$K3S_ARCH" == *"arm"* ]]; then
@@ -523,6 +599,35 @@ function k3s-install(){
   sudo mv images/*.tar /var/lib/rancher/k3s/agent/images/
   sudo chmod +x /usr/local/bin/k3s
   sudo chmod +x /opt/k3s/install.sh
+#echo '
+#  mirrors:
+#  "docker.io":
+#    endpoint:
+#      - http://127.0.0.1:5000/v2/mirror/docker.io
+#  "cr.l5d.io":
+#    endpoint:
+#      - http://127.0.0.1:5000/v2/mirror/cr.l5d.io      
+#' > /etc/rancher/k3s/registries.yaml
+
+#cat << EOF > /etc/rancher/k3s/registries.yaml
+sudo mkdir -p /etc/rancher/k3s
+echo '
+mirrors:
+  "*":
+    endpoint:
+      - "http://localhost:31111"
+configs:
+  "localhost:31111":
+    auth:
+      username: kubemaya
+      password: kubemaya
+  "docker.io":
+  "*":
+    tls:
+      insecure_skip_verify: true
+' | sudo tee /etc/rancher/k3s/registries.yaml >/dev/null
+ 
+
   write_st "Ready to install"
 ## For agents
 ##  INSTALL_K3S_SKIP_DOWNLOAD=true K3S_URL=https://$MASTER_NODE_IP_OR_FQDN:6443 K3S_TOKEN=$TOKEN_TO_USE ./install.sh
